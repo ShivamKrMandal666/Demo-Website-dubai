@@ -1,14 +1,27 @@
 import { MapPin, Navigation } from "lucide-react";
 import { Reveal } from "@/components/site/Reveal";
+import { SectionLabel } from "@/components/site/SectionLabel";
 import { clinic } from "@/lib/data/site";
 
 // Stylised map placeholder (no live API integration in this prototype).
-// Sits with a negative bottom margin so it bleeds behind the footer top.
+// A self-contained section that ends cleanly above the footer — the two are
+// deliberately separate blocks, each with its own border and shadow.
 export const MapSection = () => (
-  <section id="location" className="relative z-0 -mb-28 px-5 md:-mb-40 md:px-8 lg:px-16">
+  <section id="location" className="relative bg-background px-5 py-20 md:px-8 md:py-28 lg:px-16">
     <div className="mx-auto max-w-7xl">
+      <div className="mb-10 max-w-xl md:mb-12">
+        <Reveal>
+          <SectionLabel>Find Us</SectionLabel>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 className="mt-6 font-serif text-3xl leading-tight tracking-editorial text-foreground text-balance sm:text-4xl lg:text-5xl">
+            Moments from Bond Street
+          </h2>
+        </Reveal>
+      </div>
+
       <Reveal y={40}>
-        <div className="relative h-[440px] overflow-hidden rounded-3xl border border-border shadow-elegant md:h-[560px]">
+        <div className="relative h-[440px] overflow-hidden rounded-3xl border border-border bg-card shadow-elegant md:h-[560px]">
           {/* faux map surface */}
           <div className="absolute inset-0 bg-muted" />
           <div

@@ -19,12 +19,9 @@ export default function Home() {
         <Doctors />
         <Testimonials />
         <CtaBand />
-        {/* Map bleeds behind the footer top for an overlapping composition */}
-        <div className="relative">
-          <MapSection />
-          <Footer />
-        </div>
+        <MapSection />
       </main>
+      <Footer />
     </div>
   );
 }

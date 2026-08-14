@@ -1,11 +1,13 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { Instagram, Facebook, Youtube, Linkedin, ArrowUpRight, Phone, Mail, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { navLinks, treatments, clinic, type NavLink } from "@/lib/data/site";
-import { scrollToId } from "@/lib/smooth-scroll";
+import { navLinks, treatments, clinic } from "@/lib/data/site";
+import { useSiteNav } from "@/lib/use-site-nav";
 import { textures } from "@/lib/images";
 
 const socials = [
@@ -16,22 +18,19 @@ const socials = [
 ];
 
 export const Footer = () => {
-  const handleNav = (link: NavLink) => {
-    if (link.soon) {
-      toast("Gallery is on its way", { description: "This page is coming soon." });
-      return;
-    }
-    scrollToId(link.scroll);
-  };
+  const handleNav = useSiteNav();
 
   return (
-    <footer id="contact" className="relative z-10 overflow-hidden bg-secondary pt-40 md:pt-56">
+    // Sits as its own block below the map section — no overlap. The gold
+    // hairline plus the top border define the seam against the page above.
+    <footer
+      id="contact"
+      className="relative overflow-hidden border-t border-gold/20 bg-secondary pt-20 shadow-elegant md:pt-28"
+    >
       {/* espresso texture */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-40"
-        style={{ backgroundImage: `url(${textures.footer})` }}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 opacity-40" aria-hidden="true">
+        <Image src={textures.footer} alt="" fill sizes="100vw" className="object-cover" />
+      </div>
       <div className="absolute inset-0 bg-secondary/60" aria-hidden="true" />
       {/* top hairline accent to define the overlap edge */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" aria-hidden="true" />
@@ -86,13 +85,13 @@ export const Footer = () => {
             <h4 className="font-sans text-xs uppercase tracking-[0.24em] text-gold">Treatments</h4>
             <ul className="mt-5 space-y-3">
               {treatments.map((t) => (
-                <li key={t.name}>
-                  <button
-                    onClick={() => scrollToId("#treatments")}
+                <li key={t.slug}>
+                  <Link
+                    href={`/treatments/${t.slug}`}
                     className="text-left font-sans text-sm text-bone/70 transition-colors duration-300 hover:text-bone"
                   >
                     {t.name}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>

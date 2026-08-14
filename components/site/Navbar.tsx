@@ -1,20 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, ArrowUpRight, Phone } from "lucide-react";
+import dynamic from "next/dynamic";
+import { ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+// The mobile menu is the only thing on the site that uses Radix Dialog, and it
+// starts closed on every route. Loading it on demand keeps
+// @radix-ui/react-dialog out of the initial bundle; `ssr: false` is safe
+// because a closed Sheet renders nothing but its trigger, which lives below.
+const MobileMenu = dynamic(
+  () => import("@/components/site/MobileMenu").then((m) => m.MobileMenu),
+  { ssr: false },
+);
 import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/site";
-import { scrollToId } from "@/lib/smooth-scroll";
+import { useSiteNav } from "@/lib/use-site-nav";
+
+// The wordmark behaves like the Home nav link: scroll to top when already
+// home, navigate home from anywhere else.
+const homeLink: NavLinkType = { label: "Home", to: "/", scroll: "#top" };
 
 interface NavLinkProps {
   link: NavLinkType;
@@ -42,6 +47,7 @@ const NavLink = ({ link, scrolled, onNavigate }: NavLinkProps) => (
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const handleNavigate = useSiteNav();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -49,16 +55,6 @@ export const Navbar = () => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const handleNavigate = (link: NavLinkType) => {
-    if (link.soon) {
-      toast("Gallery is on its way", {
-        description: "This page is coming soon — check back shortly.",
-      });
-      return;
-    }
-    scrollToId(link.scroll);
-  };
 
   const handleBook = () =>
     toast("Booking request received", {
@@ -77,7 +73,7 @@ export const Navbar = () => {
       <nav className="container mx-auto flex h-[72px] items-center justify-between">
         {/* Logo placeholder */}
         <button
-          onClick={() => scrollToId("#top")}
+          onClick={() => handleNavigate(homeLink)}
           className="flex items-center gap-3"
           aria-label={clinic.name}
         >
@@ -127,55 +123,8 @@ export const Navbar = () => {
             <ArrowUpRight className="h-4 w-4" />
           </Button>
 
-          {/* Mobile menu */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <button
-                aria-label="Open menu"
-                className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden",
-                  scrolled
-                    ? "border-border text-foreground hover:bg-muted"
-                    : "border-bone/40 text-bone hover:bg-bone/10",
-                )}
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[85vw] max-w-sm border-border bg-background">
-              <SheetHeader>
-                <SheetTitle className="text-left font-serif text-2xl text-foreground">
-                  Maison Lumé
-                </SheetTitle>
-              </SheetHeader>
-              <div className="mt-8 flex flex-col gap-1">
-                {navLinks.map((link) => (
-                  <SheetClose asChild key={link.label}>
-                    <button
-                      onClick={() => handleNavigate(link)}
-                      className="group flex items-center justify-between border-b border-border/60 py-4 text-left font-serif text-xl text-foreground transition-colors hover:text-primary"
-                    >
-                      {link.label}
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </button>
-                  </SheetClose>
-                ))}
-              </div>
-              <div className="mt-8 space-y-4">
-                <SheetClose asChild>
-                  <Button onClick={handleBook} variant="gold" size="lg" className="w-full rounded-full">
-                    Book an Appointment
-                  </Button>
-                </SheetClose>
-                <a
-                  href={`tel:${clinic.phone.replace(/\s/g, "")}`}
-                  className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
-                >
-                  <Phone className="h-4 w-4" /> {clinic.phone}
-                </a>
-              </div>
-            </SheetContent>
-          </Sheet>
+          {/* Mobile menu — code-split, see the import at the top of the file */}
+          <MobileMenu scrolled={scrolled} onNavigate={handleNavigate} />
         </div>
       </nav>
     </header>

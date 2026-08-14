@@ -15,14 +15,15 @@ export interface Clinic {
 
 /**
  * Routes that actually exist in the App Router today. Widen this union when a
- * new route ships (e.g. "/treatments") — never hand a NavLink a string.
+ * new route ships — never hand a NavLink a string.
  */
-export type SupportedRoute = "/";
+export type SupportedRoute = "/" | "/treatments";
 
 /**
  * A nav link is either a "coming soon" placeholder, or a real destination that
- * MUST carry an in-page `scroll` target. The union makes the inert-link bug
- * unrepresentable: after the `soon` check, `scroll` is a required string.
+ * MUST carry both the route it lives on and an in-page `scroll` target. The
+ * union makes the inert-link bug unrepresentable: after the `soon` check,
+ * `to` and `scroll` are both guaranteed.
  */
 export type NavLink =
   | {
@@ -33,10 +34,10 @@ export type NavLink =
   | {
       label: string;
       soon?: false;
-      /** In-page selector to smooth-scroll to. Required. */
+      /** Route the section lives on. Required — drives cross-page navigation. */
+      to: SupportedRoute;
+      /** In-page selector to smooth-scroll to once on `to`. Required. */
       scroll: string;
-      /** Route the section lives on, when the link crosses pages. */
-      to?: SupportedRoute;
     };
 
 export interface TimelinePhase {
@@ -100,7 +101,7 @@ export const clinic: Clinic = {
 // `Treatments` points at the Home section until the /treatments route ships.
 export const navLinks: NavLink[] = [
   { label: "Home", to: "/", scroll: "#top" },
-  { label: "Treatments", to: "/", scroll: "#treatments" },
+  { label: "Treatments", to: "/treatments", scroll: "#treatments" },
   { label: "Doctors", to: "/", scroll: "#doctors" },
   { label: "Gallery", soon: true },
   { label: "Contact", to: "/", scroll: "#contact" },

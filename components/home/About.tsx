@@ -1,10 +1,8 @@
-"use client";
-
+import Image from "next/image";
 import { ImageIcon, ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
-import { scrollToId } from "@/lib/smooth-scroll";
+import { ScrollButton } from "@/components/site/ScrollButton";
 import { textures } from "@/lib/images";
 
 const stats = [
@@ -22,10 +20,17 @@ export const About = () => (
           <div className="relative">
             {/* offset texture panel for depth */}
             <div
-              className="absolute -left-4 -top-4 hidden h-full w-full rounded-2xl bg-cover bg-center opacity-70 md:block"
-              style={{ backgroundImage: `url(${textures.about})` }}
+              className="absolute -left-4 -top-4 hidden h-full w-full overflow-hidden rounded-2xl opacity-70 md:block"
               aria-hidden="true"
-            />
+            >
+              <Image
+                src={textures.about}
+                alt=""
+                fill
+                sizes="(min-width: 768px) 42vw, 100vw"
+                className="object-cover"
+              />
+            </div>
             <div className="absolute -left-4 -top-4 hidden h-full w-full rounded-2xl bg-primary/10 md:block" aria-hidden="true" />
             <div className="relative flex aspect-[4/5] flex-col items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-muted/70 shadow-soft">
               <ImageIcon className="h-8 w-8 text-primary/50" />
@@ -78,15 +83,15 @@ export const About = () => (
           </Reveal>
 
           <Reveal delay={0.2}>
-            <Button
-              onClick={() => scrollToId("#doctors")}
+            <ScrollButton
+              to="#doctors"
               variant="outlineSage"
               size="lg"
               className="mt-8 rounded-full"
             >
               Meet our specialists
               <ArrowUpRight className="h-4 w-4" />
-            </Button>
+            </ScrollButton>
           </Reveal>
         </div>
       </div>

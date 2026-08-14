@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Jost } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
+import { RouteTransition } from "@/components/site/RouteTransition";
+import { MotionProvider } from "@/components/site/MotionProvider";
 import { clinic } from "@/lib/data/site";
 import "@/app/globals.css";
 
@@ -41,8 +43,9 @@ export default function RootLayout({
     <html lang="en" className={`${fraunces.variable} ${jost.variable}`}>
       <body>
         <SmoothScroll />
+        <RouteTransition />
         <div className="grain-overlay" aria-hidden="true" />
-        {children}
+        <MotionProvider>{children}</MotionProvider>
         <Toaster position="top-center" />
       </body>
     </html>

@@ -1,8 +1,7 @@
-"use client";
-
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { ToastButton, BOOKING_TOAST } from "@/components/site/ToastButton";
+import { ScrollButton } from "@/components/site/ScrollButton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { MapSection } from "@/components/home/MapSection";
@@ -11,24 +10,27 @@ import { Reveal, RevealStagger } from "@/components/site/Reveal";
 import { TreatmentGridCard } from "@/components/treatments/TreatmentGridCard";
 import { treatments } from "@/lib/data/site";
 import { backgrounds, textures } from "@/lib/images";
-import { scrollToId } from "@/lib/smooth-scroll";
 
-// PARKED — not routed yet. See components/treatments/README.md.
+// Rendered by app/treatments/page.tsx. A server component: the booking toast
+// and the in-page scroll CTA are the only interactive parts, and they live in
+// the ToastButton / ScrollButton client leaves, so none of this markup ships
+// to the browser.
 export default function TreatmentsPage() {
-  const book = () =>
-    toast("Booking request received", {
-      description: "Our concierge will confirm your appointment shortly.",
-    });
-
   return (
     <div className="relative min-h-screen bg-background text-foreground">
       <Navbar />
       <main>
         {/* Hero — single static background image */}
         <section id="top" className="relative flex h-[62vh] min-h-[460px] items-center overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center animate-kenburns"
-            style={{ backgroundImage: `url(${backgrounds.treatmentsHero})` }}
+          {/* LCP element for this route — fetched eagerly. */}
+          <Image
+            src={backgrounds.treatmentsHero}
+            alt=""
+            aria-hidden="true"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
@@ -49,12 +51,18 @@ export default function TreatmentsPage() {
             </Reveal>
             <Reveal delay={0.24}>
               <div className="mt-8 flex flex-wrap gap-4">
-                <Button onClick={book} variant="gold" size="xl" className="rounded-full">
+                <ToastButton
+                  title={BOOKING_TOAST.title}
+                  description={BOOKING_TOAST.description}
+                  variant="gold"
+                  size="xl"
+                  className="rounded-full"
+                >
                   Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                </Button>
-                <Button onClick={() => scrollToId("#treatments")} variant="hero" size="xl" className="rounded-full">
+                </ToastButton>
+                <ScrollButton to="#treatments" variant="hero" size="xl" className="rounded-full">
                   Explore the menu
-                </Button>
+                </ScrollButton>
               </div>
             </Reveal>
           </div>
@@ -62,11 +70,9 @@ export default function TreatmentsPage() {
 
         {/* Our Treatments — non-uniform grid */}
         <section id="treatments" className="relative overflow-hidden py-20 md:py-28">
-          <div
-            className="absolute inset-0 bg-muted bg-cover bg-center opacity-60"
-            style={{ backgroundImage: `url(${textures.treatments})` }}
-            aria-hidden="true"
-          />
+          <div className="absolute inset-0 bg-muted opacity-60" aria-hidden="true">
+            <Image src={textures.treatments} alt="" fill sizes="100vw" className="object-cover" />
+          </div>
           <div className="absolute inset-0 bg-background/55" aria-hidden="true" />
           <div className="container relative z-10 mx-auto">
             <div className="max-w-2xl">
@@ -98,8 +104,8 @@ export default function TreatmentsPage() {
         </section>
 
         <MapSection />
-        <Footer />
       </main>
+      <Footer />
     </div>
   );
 }
