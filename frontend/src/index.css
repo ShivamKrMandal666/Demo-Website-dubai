@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  MAISON LUMÉ — Design System
+  Editorial aesthetic-clinic palette:
+  - Bone / cream warm neutrals (background)
+  - Espresso near-black (foreground / contrast)
+  - Muted olive-sage (primary)
+  - Soft champagne gold (accent highlight)
+  Fonts: Fraunces (editorial serif) + Jost (refined geometric sans)
+  ALL tokens in HSL space-separated format.
+*/
+
+@layer base {
+  :root {
+    --background: 40 33% 96%;        /* warm bone */
+    --foreground: 24 24% 12%;        /* espresso near-black */
+
+    --card: 40 40% 98%;
+    --card-foreground: 24 24% 12%;
+
+    --popover: 40 40% 98%;
+    --popover-foreground: 24 24% 12%;
+
+    --primary: 96 16% 37%;           /* muted olive-sage */
+    --primary-foreground: 40 40% 97%;
+
+    --secondary: 24 22% 15%;         /* espresso */
+    --secondary-foreground: 40 40% 96%;
+
+    --muted: 38 26% 90%;             /* warm beige */
+    --muted-foreground: 28 12% 40%;
+
+    --accent: 36 46% 60%;            /* champagne gold */
+    --accent-foreground: 24 30% 13%;
+
+    --destructive: 6 62% 46%;
+    --destructive-foreground: 40 40% 97%;
+
+    --border: 34 20% 84%;
+    --input: 34 20% 84%;
+    --ring: 96 16% 37%;
+
+    /* Named brand tokens */
+    --espresso: 24 24% 12%;
+    --espresso-deep: 24 26% 8%;
+    --sage: 96 16% 37%;
+    --sage-light: 92 18% 58%;
+    --gold: 36 46% 60%;
+    --gold-soft: 38 52% 74%;
+    --bone: 40 33% 96%;
+    --cream: 40 44% 98%;
+
+    /* Gradients (used on section bg / overlays only) */
+    --gradient-hero: linear-gradient(90deg, hsl(24 26% 8% / 0.86) 0%, hsl(24 26% 8% / 0.55) 42%, hsl(24 26% 8% / 0.12) 100%);
+    --gradient-hero-bottom: linear-gradient(180deg, hsl(24 26% 8% / 0) 45%, hsl(24 26% 8% / 0.65) 100%);
+    --gradient-sage: linear-gradient(135deg, hsl(96 18% 32%), hsl(92 16% 46%));
+    --gradient-gold: linear-gradient(135deg, hsl(38 52% 66%), hsl(34 44% 55%));
+    --gradient-fade-bone: linear-gradient(180deg, hsl(40 33% 96% / 0.9) 0%, hsl(40 33% 96% / 0.78) 100%);
+
+    /* Shadows */
+    --shadow-elegant: 0 30px 70px -28px hsl(24 24% 12% / 0.38);
+    --shadow-soft: 0 14px 36px -18px hsl(24 24% 12% / 0.24);
+    --shadow-gold: 0 12px 40px -12px hsl(36 46% 48% / 0.42);
+
+    --radius: 0.75rem;
+
+    --font-serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+    --font-sans: 'Jost', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+
+  .dark {
+    --background: 24 22% 9%;
+    --foreground: 40 30% 92%;
+    --card: 24 20% 12%;
+    --card-foreground: 40 30% 92%;
+    --popover: 24 20% 12%;
+    --popover-foreground: 40 30% 92%;
+    --primary: 92 18% 56%;
+    --primary-foreground: 24 24% 10%;
+    --secondary: 40 30% 92%;
+    --secondary-foreground: 24 24% 12%;
+    --muted: 24 14% 18%;
+    --muted-foreground: 38 16% 66%;
+    --accent: 38 50% 64%;
+    --accent-foreground: 24 30% 12%;
+    --destructive: 6 55% 42%;
+    --destructive-foreground: 40 40% 97%;
+    --border: 30 14% 22%;
+    --input: 30 14% 22%;
+    --ring: 92 18% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  body {
+    @apply bg-background text-foreground;
+    margin: 0;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    font-feature-settings: 'ss01', 'cv01';
+  }
+  ::selection {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: hsl(var(--muted)); }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.45);
+    border-radius: 9999px;
+    border: 2px solid hsl(var(--muted));
+  }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--primary) / 0.75); }
+}
+
+/* Lenis smooth-scroll recommended styles */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+@layer utilities {
+  .font-serif { font-family: var(--font-serif); }
+  .font-sans { font-family: var(--font-sans); }
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  /* Fine film grain overlay for premium tactility */
+  .grain-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 41;
+    pointer-events: none;
+    opacity: 0.045;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@layer base {
+  [data-debug-wrapper="true"] { display: contents !important; }
+  [data-debug-wrapper="true"] > * {
+    margin-left: inherit; margin-right: inherit; margin-top: inherit; margin-bottom: inherit;
+    padding-left: inherit; padding-right: inherit; padding-top: inherit; padding-bottom: inherit;
+    column-gap: inherit; row-gap: inherit; gap: inherit;
+    border-left-width: inherit; border-right-width: inherit; border-top-width: inherit; border-bottom-width: inherit;
+    border-left-style: inherit; border-right-style: inherit; border-top-style: inherit; border-bottom-style: inherit;
+    border-left-color: inherit; border-right-color: inherit; border-top-color: inherit; border-bottom-color: inherit;
+  }
+}
