@@ -169,7 +169,9 @@ Lenis is initialised **once** in `components/site/SmoothScroll.tsx`, mounted in
 the root layout: `duration: 1.15`, exponential easing, `touchMultiplier: 1.4`.
 The instance is on `window.__lenis`; use `scrollToId()` from
 `lib/smooth-scroll.ts` for in-page jumps (it applies a `-72px` offset for the
-fixed navbar). Never construct a second Lenis instance.
+fixed navbar, on both the Lenis and the native path). Never construct a second
+Lenis instance. Under `prefers-reduced-motion: reduce` no Lenis is created —
+`window.__lenis` stays `null` and `scrollToId()` jumps instantly instead.
 
 ---
 
@@ -200,7 +202,7 @@ centres it. Every section starts with one.
 
 ### Card pattern
 
-```
+```text
 rounded-2xl border border-border bg-card shadow-soft
 transition-[transform,box-shadow,border-color] duration-500
 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant
@@ -230,9 +232,9 @@ new slot awaiting real photography.
   images), `heroes/` (per-treatment hero backgrounds) and `backgrounds/`
   (section textures). They are already optimized — **never regenerate or
   re-compress them.**
-- Paths are referenced **only** through the manifest in `lib/images.ts` (and
-  the home-page aliases in `lib/assets.ts`). Never inline an image path in a
-  component.
+- Paths are referenced **only** through the manifest in `lib/images.ts`, which
+  also exports the home-page aliases (`heroImages`, `textures`). Never inline
+  an image path in a component.
 - Background imagery always sits under a scrim (`bg-gradient-hero`,
   `bg-espresso-deep/70`, or `bg-background/50`) so text contrast holds.
 

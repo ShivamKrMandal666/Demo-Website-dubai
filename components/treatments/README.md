@@ -18,7 +18,9 @@ When routing them, also handle:
 
 - `TreatmentDetailPage` currently returns `null` for an unknown slug — swap for `notFound()`.
 - The `<img>` tags should become `next/image`.
-- The dead nav links (`link.target`) in `Navbar`/`Footer` need fixing so the
-  Treatments link actually navigates — see `context/progress-tracker.md`.
+- Nav links now scroll to Home sections (`NavLink.scroll`). Point the
+  Treatments link at the new route: widen `SupportedRoute` in
+  `lib/data/site.ts` and make `Navbar`/`Footer` navigate when `to` is not the
+  current route — see `context/progress-tracker.md`.
 - Scroll-to-top on route change (the old `ScrollToTop` component) needs
   re-adding, integrated with Lenis.

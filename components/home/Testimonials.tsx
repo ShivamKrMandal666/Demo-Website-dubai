@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
 import { testimonials, googleRating } from "@/lib/data/site";
-import { textures } from "@/lib/assets";
+import { textures } from "@/lib/images";
 
 const GoogleG = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 48 48" className={className} aria-hidden="true">

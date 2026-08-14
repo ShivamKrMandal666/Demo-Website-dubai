@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
-import { textures } from "@/lib/assets";
+import { textures } from "@/lib/images";
 
 export const CtaBand = () => (
   <section className="relative overflow-hidden">

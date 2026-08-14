@@ -36,6 +36,7 @@ npm run lint
 - Server components by default; `"use client"` only where interactivity
   requires it.
 - The 29 images in `public/images/` are final — never regenerate or
-  re-compress them. Reference them only through `lib/images.ts`.
+  re-compress them. `lib/images.ts` is the single image manifest: reference
+  every path through it, and never inline one in a component.
 - Components come from shadcn/ui (`npx shadcn add <name>`) or Vengeance UI
   (`npx shadcn add @vengeanceui/<name>`).

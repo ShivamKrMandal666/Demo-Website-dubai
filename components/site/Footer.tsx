@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { navLinks, treatments, clinic, type NavLink } from "@/lib/data/site";
 import { scrollToId } from "@/lib/smooth-scroll";
-import { textures } from "@/lib/assets";
+import { textures } from "@/lib/images";
 
 const socials = [
   { Icon: Instagram, label: "Instagram" },
@@ -21,7 +21,7 @@ export const Footer = () => {
       toast("Gallery is on its way", { description: "This page is coming soon." });
       return;
     }
-    scrollToId(link.target);
+    scrollToId(link.scroll);
   };
 
   return (

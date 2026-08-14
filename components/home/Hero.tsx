@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
-import { heroImages } from "@/lib/assets";
+import { heroImages } from "@/lib/images";
 import { scrollToId } from "@/lib/smooth-scroll";
 
 const EASE = [0.22, 1, 0.36, 1] as const;

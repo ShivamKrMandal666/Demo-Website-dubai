@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
 import { treatments, type Treatment } from "@/lib/data/site";
-import { textures } from "@/lib/assets";
+import { textures } from "@/lib/images";
 
 const TreatmentCard = ({ t, className }: { t: Treatment; className?: string }) => (
   <RevealItem className={cn("h-full", className)}>

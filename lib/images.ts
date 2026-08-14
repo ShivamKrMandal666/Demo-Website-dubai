@@ -38,3 +38,15 @@ export const backgrounds = {
   textureFooter: `${B}/texture-footer.jpg`,
   ctaBand: `${B}/cta-band.jpg`,
 } as const;
+
+// Home-page aliases: the rotating hero backdrops and the per-section textures,
+// named by the section that uses them.
+export const heroImages: string[] = [backgrounds.hero1, backgrounds.hero2, backgrounds.hero3];
+
+export const textures = {
+  about: backgrounds.textureAbout,
+  treatments: backgrounds.textureTreatments,
+  testimonial: backgrounds.textureTestimonial,
+  footer: backgrounds.textureFooter,
+  ctaBand: backgrounds.ctaBand,
+} as const;

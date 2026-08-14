@@ -51,14 +51,12 @@ change.
 
 ## Open Questions
 
-- **Nav links are inert.** `Navbar` and `Footer` both call
-  `scrollToId(link.target)`, but `navLinks` in `lib/data/site.ts` defines
-  `to` / `scroll` and never `target` — so Home, Doctors and Contact do nothing
-  when clicked. This predates the migration and was carried over deliberately
-  (the migration bar was "behaviourally identical"), with `target?: string`
-  added to the `NavLink` type purely to keep the original call sites intact.
-  Decide the fix alongside routing: most likely restore the route-aware
-  `useSiteNav` behaviour that was written but never wired up.
+- **Nav links — fixed.** `NavLink` is now a discriminated union: a link is
+  either `soon: true` or carries a required `scroll` target, so `Navbar` and
+  `Footer` call `scrollToId(link.scroll)` with a guaranteed value and the
+  inert Home / Treatments / Doctors / Contact links work. `to` is typed as
+  `SupportedRoute` (`"/"` only). When `/treatments` ships, widen
+  `SupportedRoute` and add route-aware navigation for cross-page links.
 - **Parked Treatments components.** `components/treatments/` holds fully
   ported, typed page components that are deliberately **not** under `app/`, so
   no new routes are live. See `components/treatments/README.md` for the

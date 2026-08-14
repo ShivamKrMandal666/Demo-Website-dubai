@@ -57,7 +57,7 @@ export const Navbar = () => {
       });
       return;
     }
-    scrollToId(link.target);
+    scrollToId(link.scroll);
   };
 
   const handleBook = () =>

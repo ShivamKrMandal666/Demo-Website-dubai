@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { scrollToId } from "@/lib/smooth-scroll";
-import { textures } from "@/lib/assets";
+import { textures } from "@/lib/images";
 
 const stats = [
   { value: "15+", label: "Years of practice" },

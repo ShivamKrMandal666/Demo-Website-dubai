@@ -26,7 +26,7 @@ Other scripts: `npm run build`, `npm run start`, `npm run lint`,
 
 ## Structure
 
-```
+```text
 app/                 App Router routes — layout.tsx, page.tsx (Home), globals.css
 components/
   site/              Navbar, Footer, Reveal, SectionLabel, SmoothScroll
@@ -36,7 +36,6 @@ components/
 lib/
   data/site.ts       All typed dummy content
   images.ts          Central image manifest — the only place image paths live
-  assets.ts          Home-page background aliases
   smooth-scroll.ts   scrollToId() helper over the Lenis instance
   utils.ts           cn()
 public/images/       29 optimized images (treatments / heroes / backgrounds)

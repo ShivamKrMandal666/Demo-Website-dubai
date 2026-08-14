@@ -10,8 +10,7 @@ import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger } from "@/components/site/Reveal";
 import { TreatmentGridCard } from "@/components/treatments/TreatmentGridCard";
 import { treatments } from "@/lib/data/site";
-import { backgrounds } from "@/lib/images";
-import { textures } from "@/lib/assets";
+import { backgrounds, textures } from "@/lib/images";
 import { scrollToId } from "@/lib/smooth-scroll";
 
 // PARKED — not routed yet. See components/treatments/README.md.

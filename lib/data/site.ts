@@ -13,22 +13,31 @@ export interface Clinic {
   hours: string;
 }
 
-export interface NavLink {
-  label: string;
-  /** Route to navigate to, when the link crosses pages. */
-  to?: string;
-  /** In-page selector to smooth-scroll to. */
-  scroll?: string;
-  /** Renders a "coming soon" toast instead of navigating. */
-  soon?: boolean;
-  /**
-   * KNOWN ISSUE — Navbar and Footer read `link.target`, but no link below
-   * defines it, so the Home / Doctors / Contact links are inert. Carried over
-   * verbatim from the pre-migration code; see context/progress-tracker.md.
-   * Fix belongs with the routing work, once /treatments exists.
-   */
-  target?: string;
-}
+/**
+ * Routes that actually exist in the App Router today. Widen this union when a
+ * new route ships (e.g. "/treatments") — never hand a NavLink a string.
+ */
+export type SupportedRoute = "/";
+
+/**
+ * A nav link is either a "coming soon" placeholder, or a real destination that
+ * MUST carry an in-page `scroll` target. The union makes the inert-link bug
+ * unrepresentable: after the `soon` check, `scroll` is a required string.
+ */
+export type NavLink =
+  | {
+      label: string;
+      /** Renders a "coming soon" toast instead of navigating. */
+      soon: true;
+    }
+  | {
+      label: string;
+      soon?: false;
+      /** In-page selector to smooth-scroll to. Required. */
+      scroll: string;
+      /** Route the section lives on, when the link crosses pages. */
+      to?: SupportedRoute;
+    };
 
 export interface TimelinePhase {
   phase: string;
@@ -87,12 +96,14 @@ export const clinic: Clinic = {
   hours: "Mon – Sat · 9:00 – 19:00",
 };
 
+// Single-page site for now: every live link scrolls to a section on "/".
+// `Treatments` points at the Home section until the /treatments route ships.
 export const navLinks: NavLink[] = [
   { label: "Home", to: "/", scroll: "#top" },
-  { label: "Treatments", to: "/treatments" },
+  { label: "Treatments", to: "/", scroll: "#treatments" },
   { label: "Doctors", to: "/", scroll: "#doctors" },
   { label: "Gallery", soon: true },
-  { label: "Contact", scroll: "#contact" },
+  { label: "Contact", to: "/", scroll: "#contact" },
 ];
 
 // The 10 treatments. `home: true` items appear in the Home "Signature

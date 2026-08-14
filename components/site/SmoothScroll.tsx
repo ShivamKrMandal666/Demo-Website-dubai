@@ -8,6 +8,13 @@ import Lenis from "lenis";
 // Mounted ONCE in the root layout — never per page.
 export function SmoothScroll() {
   useEffect(() => {
+    // Reduced motion: no Lenis at all — scrollToId() falls back to instant
+    // native scrolling while window.__lenis is null.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      window.__lenis = null;
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.15,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
