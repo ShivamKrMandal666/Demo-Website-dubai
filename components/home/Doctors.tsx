@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence } from "motion/react";
 import * as m from "motion/react-m";
-import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { doctors } from "@/lib/data/site";
+import { doctorPortrait } from "@/lib/images";
 
 const DURATION = 5500;
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -51,32 +55,28 @@ export const Doctors = () => {
         </Reveal>
 
         <div className="mt-12 grid items-center gap-10 md:mt-16 md:grid-cols-2 md:gap-16">
-          {/* Portrait placeholder (rotates) */}
+          {/* Portrait (rotates) */}
           <div className="relative">
             <div className="pointer-events-none absolute -left-3 -top-3 h-full w-full rounded-2xl border border-gold/25" aria-hidden="true" />
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-bone/15 bg-espresso-deep/60">
-              <AnimatePresence mode="wait" custom={dir}>
-                <m.div
-                  key={doc.name}
-                  custom={dir}
-                  variants={slide}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.55, ease: EASE }}
-                  className="absolute inset-0 flex flex-col items-center justify-center"
-                >
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full border border-gold/40 bg-bone/5">
-                    <span className="font-serif text-3xl text-gold">{doc.initials}</span>
-                  </div>
-                  <div className="mt-5 flex flex-col items-center gap-1">
-                    <ImageIcon className="h-5 w-5 text-bone/40" />
-                    <span className="font-sans text-[0.64rem] uppercase tracking-[0.24em] text-bone/45">
-                      Portrait image
-                    </span>
-                  </div>
-                </m.div>
-              </AnimatePresence>
+              {/* All five portraits are in the DOM at once, crossfading on
+                  opacity — the same approach the Hero slideshow uses. Inside
+                  AnimatePresence only the active slide would be mounted, so
+                  each rotation would fetch its portrait on arrival and pop.
+                  The detail pane below keeps AnimatePresence and its slide. */}
+              {doctors.map((d, i) => (
+                <Image
+                  key={d.slug}
+                  src={doctorPortrait(d.slug)}
+                  alt={d.name}
+                  fill
+                  sizes="(min-width: 768px) 45vw, 100vw"
+                  className={cn(
+                    "object-cover transition-opacity duration-700 ease-out",
+                    i === active ? "opacity-100" : "opacity-0",
+                  )}
+                />
+              ))}
               {/* name overlay */}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-espresso-deep/90 to-transparent p-6">
                 <p className="font-serif text-xl text-bone">{doc.name}</p>
@@ -158,6 +158,13 @@ export const Doctors = () => {
                 transition={{ duration: DURATION / 1000, ease: "linear" }}
               />
             </div>
+
+            <Button asChild variant="outlineBone" size="sm" className="mt-8 rounded-full">
+              <Link href="/doctors">
+                Meet the team
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
