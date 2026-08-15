@@ -3,7 +3,8 @@
 // All imagery lives in /public/images (optimized WebP-quality JPEGs) and is
 // referenced ONLY from here, so image paths are never scattered across
 // components. Folders: treatments/ (card images), heroes/ (detail-page hero
-// backgrounds), backgrounds/ (home + treatments-page section backgrounds).
+// backgrounds), doctors/ (portraits), backgrounds/ (home + treatments-page
+// section backgrounds).
 //
 // Every image is a STATIC IMPORT rather than a string path. Two reasons:
 //
@@ -21,7 +22,7 @@
 //     silent runtime undefined.
 // ---------------------------------------------------------------------------
 import type { StaticImageData } from "next/image";
-import type { TreatmentSlug } from "@/lib/data/site";
+import type { DoctorSlug, TreatmentSlug } from "@/lib/data/site";
 
 // -- treatment card images (also reused on the individual detail page) -------
 import cardInjectablesFillers from "@/public/images/treatments/injectables-fillers.jpg";
@@ -46,6 +47,13 @@ import heroThreadLifts from "@/public/images/heroes/thread-lifts.jpg";
 import heroChemicalPeels from "@/public/images/heroes/chemical-peels.jpg";
 import heroHairRestoration from "@/public/images/heroes/hair-restoration.jpg";
 import heroFacialContouringJawline from "@/public/images/heroes/facial-contouring-jawline.jpg";
+
+// -- doctor portraits (4:5, Home carousel + /doctors profiles) ---------------
+import portraitElenaWhitfield from "@/public/images/doctors/elena-whitfield.jpg";
+import portraitMarcusAdeyemi from "@/public/images/doctors/marcus-adeyemi.jpg";
+import portraitSofiaMarchetti from "@/public/images/doctors/sofia-marchetti.jpg";
+import portraitJonathanPryce from "@/public/images/doctors/jonathan-pryce.jpg";
+import portraitRamiHaddad from "@/public/images/doctors/rami-haddad.jpg";
 
 // -- section backgrounds -----------------------------------------------------
 import bgTreatmentsHero from "@/public/images/backgrounds/treatments-hero.jpg";
@@ -87,10 +95,25 @@ const heroImagesBySlug: Record<TreatmentSlug, StaticImageData> = {
   "facial-contouring-jawline": heroFacialContouringJawline,
 };
 
+// Same contract, keyed by DoctorSlug: adding a doctor to lib/data/site.ts
+// without adding a portrait is a typecheck failure, not a runtime undefined.
+// These are 720x900 apart from marcus-adeyemi.jpg (585x731), whose source was
+// smaller — the static import carries each file's real size, so next/image
+// never generates a candidate above it either way.
+const doctorPortraits: Record<DoctorSlug, StaticImageData> = {
+  "elena-whitfield": portraitElenaWhitfield,
+  "marcus-adeyemi": portraitMarcusAdeyemi,
+  "sofia-marchetti": portraitSofiaMarchetti,
+  "jonathan-pryce": portraitJonathanPryce,
+  "rami-haddad": portraitRamiHaddad,
+};
+
 // Per-treatment card image (also reused on the individual detail page)
 export const treatmentCardImage = (slug: TreatmentSlug): StaticImageData => cardImages[slug];
 // Per-treatment unique detail-page hero background
 export const treatmentHeroImage = (slug: TreatmentSlug): StaticImageData => heroImagesBySlug[slug];
+// Per-doctor portrait
+export const doctorPortrait = (slug: DoctorSlug): StaticImageData => doctorPortraits[slug];
 
 export const backgrounds = {
   treatmentsHero: bgTreatmentsHero,

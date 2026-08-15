@@ -5,8 +5,11 @@ once its outcome lands in Completed or Architecture Decisions.
 
 ## Status
 
-- **Prototype.** Home, Treatments and the ten treatment detail pages are built,
-  verified and live. Nothing in flight. Next unit: the Doctors page.
+- **Prototype.** Home, Treatments, the ten treatment detail pages and Doctors
+  are built and live. Nothing in flight. Next unit: the Gallery page.
+- **One check outstanding on `/doctors`:** Lighthouse mobile (median of 3) has
+  not been run — no browser tooling in the session that built it. Static checks
+  all pass (see Session Notes).
 
 ## Completed
 
@@ -17,9 +20,15 @@ once its outcome lands in Completed or Architecture Decisions.
   driven entirely by the `Treatment` record for its slug, so an 11th treatment
   is a data edit plus two images. All ten prerender (SSG) with
   `dynamicParams = false`; an unknown slug 404s.
+- **Doctors page (`/doctors`)** — hero, ethos + stats band, five alternating
+  full-width profiles (portrait, credentials, bio, approach, clinical focus,
+  training, languages, tags, per-doctor booking CTA), a "How we work" band, CTA
+  band, Map, Footer. Server component; the Home carousel now shows the real
+  portraits and links here.
 - **Design system** — token set in `app/globals.css` + `tailwind.config.ts`,
   documented in `context/ui-context.md`.
-- **29 optimized images** in `public/images/` (2.5 MB).
+- **34 optimized images** in `public/images/` (2.8 MB) — `treatments/`,
+  `heroes/`, `doctors/`, `backgrounds/`.
 - **Performance pass** — First Load JS 201 kB -> 165 kB on `/`, 196 kB -> 160 kB
   on the treatments routes.
 - **Review fixes** (`context/prompts/current-issue.md`) — first paint, mobile nav
@@ -29,13 +38,30 @@ once its outcome lands in Completed or Architecture Decisions.
 
 ## Next Up
 
-1. **Doctors page.**
-2. **Gallery page** — the only remaining `soon: true` nav link.
-3. **Contact page** — currently `#contact` scrolls to the footer.
-4. When those ship, widen `SupportedRoute` and add their nav entries.
+1. **Gallery page** — the only remaining `soon: true` nav link.
+2. **Contact page** — currently `#contact` scrolls to the footer.
+3. `SupportedRoute` is now `"/" | "/treatments" | "/doctors"`. Widen it for
+   those two as they ship and swap their `navLinks` entries over, the same way
+   Doctors moved from `{ to: "/", scroll: "#doctors" }` to
+   `{ to: "/doctors", scroll: "#top" }`.
+4. **Run Lighthouse mobile (median of 3) on `/doctors`** and record it below
+   next to the other three route types.
 
 ## Open Questions
 
+- **Three of the five doctor portraits are identifiable real people, used with
+  their identifying marks intact.** `elena-whitfield.jpg` carries coat
+  embroidery reading *"Erin Gilbert, MD · Obstetrics & Gynecology"*;
+  `rami-haddad.jpg` carries a name badge reading *"Dr. Yusuf Yildirim"*
+  (Brenners Medical Care, Baden-Baden); `marcus-adeyemi.jpg` is Dr. Mike
+  Varshavski, a public figure, and carries a *"© Doctor Mike Varshavski"*
+  watermark bottom-left. This was raised before implementation and the
+  instruction was to use all five exactly as supplied, cropped to 4:5 and
+  nothing more. Recorded because the site is cold-emailed as a commercial
+  pitch — swap in licensed or generated portraits before any real send.
+- **`Dr. Amara Okafor` was renamed `Dr. Rami Haddad`** (same credentials,
+  specialty and tags) so the five names and five photos line up. Dummy content;
+  revert freely if the copy matters more than the pairing.
 - **Scroll smoothness is untouched, with measured cost.** `.grain-overlay` is
   `position: fixed`, full-viewport, `mix-blend-mode: multiply`
   (`app/globals.css:145`), forcing a whole-viewport recomposite every frame and
@@ -97,6 +123,27 @@ once its outcome lands in Completed or Architecture Decisions.
   backgrounds were *upscaled* (`texture-treatments.jpg` came back 308 KB from a
   239 KB source). Static imports plus `deviceSizes` capped at 1200 in
   `next.config.ts` mean no candidate ever exceeds the source.
+- **`Doctor` follows `Treatment` exactly, one tier down.** `doctors` is
+  `as const satisfies readonly Doctor[]`, so `DoctorRecord` and `DoctorSlug`
+  are generated from the array; `Doctor.slug` stays `string` and `tags` /
+  `languages` / `focus` / `training` are `readonly` for the same
+  circularity reason the treatments have. `lib/images.ts` adds a
+  `Record<DoctorSlug, StaticImageData>` and a `doctorPortrait(slug)` accessor,
+  so a doctor without a portrait fails `typecheck`. There is deliberately **no
+  `/doctors/[slug]` route** — the prototype is five pages, and the expanded
+  profiles live inline on the one page.
+- **The Home carousel's portraits sit outside `AnimatePresence`.** All five
+  `<Image>` elements are in the DOM, crossfading on `opacity` — the same
+  approach the Hero slideshow uses. Inside `AnimatePresence` only the active
+  slide is mounted, so every 5.5 s rotation would fetch that portrait on
+  arrival and visibly pop. The **detail pane keeps `AnimatePresence`** and its
+  slide-x motion; only the image layer changed. Cost: `/` First Load JS
+  165 kB -> 168 kB (the `next/link` + `Button` for "Meet the team"). **All five
+  carry `alt="" aria-hidden="true"`** — `opacity-0` does not remove an element
+  from the accessibility tree, so naming them announced four hidden doctors
+  plus a duplicate of the active one. The overlay and the detail pane already
+  name the active doctor in text. The `/doctors` profile portraits keep real
+  `alt` text: there is one per profile and only one is ever shown.
 - **The slug union is generated from the treatment data.** `lib/data/site.ts`
   declares `treatments` `as const satisfies readonly Treatment[]` — `satisfies`
   type-checks each entry, `as const` keeps each `slug` literal. `TreatmentSlug`,
@@ -164,7 +211,14 @@ once its outcome lands in Completed or Architecture Decisions.
   Path alias `@/*` → repo root.
 - All content is static dummy data in `lib/data/site.ts` (`Clinic`, `NavLink`,
   `Treatment`, `Doctor`, `Testimonial`, `GoogleRating`). Ten treatments; five
-  carry `home: true` and populate the Home bento grid.
+  carry `home: true` and populate the Home bento grid. Five doctors, each with
+  a slug that keys its portrait.
+- **`context/prompts/doctors-page.md` was empty** when the Doctors page was
+  built — there was no written spec. The structure was derived from the
+  `/treatments` precedent plus `ui-context.md` and confirmed point by point
+  before implementation; the four decisions taken (all five photos as supplied,
+  single page with expanded profiles rather than `[slug]` details, hero reuses
+  `backgrounds.hero2`, Home carousel swapped over) are the record.
 - Pre-migration code is preserved in git history at commit `5f60112` under
   `frontend/`, if a behaviour needs checking against the original.
 - **Never judge load time from `npm run dev`** — dev chunks are unminified,
@@ -175,10 +229,21 @@ once its outcome lands in Completed or Architecture Decisions.
   and a full second of LCP on this machine.
 - Screenshot comparisons of `/` need a ~2.2% noise floor — the Hero (5 s) and
   Doctors (5.5 s) carousels auto-rotate, so two captures of the same build differ.
-- Last verification (2026-08-15): `typecheck`, `lint` and `build` clean, 15
-  static pages, every route 200 and an unknown slug 404. Served HTML carries the
-  mobile trigger, a visible hero `<h1>` and one image preload on all three route
-  types. Lighthouse mobile, median of 3 — `/` 82 (FCP 2.0 s, LCP 4.6 s, SI 2.0 s,
-  TBT 40 ms), `/treatments` 83 (LCP 4.2 s), `[slug]` 87 (LCP 3.8 s), CLS 0.
+- Last verification (2026-08-15, after the Doctors page): `typecheck`, `lint`
+  and `build` clean, **16** static pages, `/doctors` prerendered `○` at
+  449 B / 162 kB. `/`, `/treatments`, `/doctors` and a real slug all 200; an
+  unknown slug still 404s. Served `/doctors` HTML carries a visible hero `<h1>`
+  (no inline `opacity:0`), exactly one image preload, all five portraits and
+  the `/doctors` link from the Home carousel.
+- **Not re-measured this round:** Lighthouse. The numbers below are from the
+  previous verification and predate the Doctors page — `/` 82 (FCP 2.0 s,
+  LCP 4.6 s, SI 2.0 s, TBT 40 ms), `/treatments` 83 (LCP 4.2 s), `[slug]` 87
+  (LCP 3.8 s), CLS 0. `/` gained five lazy below-fold portraits, so re-run it
+  alongside the first `/doctors` measurement.
+- **Not verified visually:** the responsive behaviour of the alternating
+  profile blocks at 375 / 768 / 1440. The grid classes were checked in the
+  served HTML (portrait `md:col-span-5`, flipped rows adding
+  `md:order-2 md:col-start-8`; details `md:col-span-6 md:col-start-7`, flipped
+  `md:order-1`; single column below `md`), but nothing rendered them.
 - Before the next unit, run `/plugin` to confirm the four declared plugins
   installed — they need a repo-trust confirmation.
