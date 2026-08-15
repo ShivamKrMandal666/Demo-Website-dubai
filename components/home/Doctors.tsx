@@ -63,12 +63,19 @@ export const Doctors = () => {
                   opacity — the same approach the Hero slideshow uses. Inside
                   AnimatePresence only the active slide would be mounted, so
                   each rotation would fetch its portrait on arrival and pop.
-                  The detail pane below keeps AnimatePresence and its slide. */}
+                  The detail pane below keeps AnimatePresence and its slide.
+
+                  All five are decorative: `opacity-0` does not remove an
+                  element from the accessibility tree, so naming them here
+                  would announce four hidden doctors alongside the active one.
+                  The overlay below and the detail pane already name the active
+                  doctor in text. */}
               {doctors.map((d, i) => (
                 <Image
                   key={d.slug}
                   src={doctorPortrait(d.slug)}
-                  alt={d.name}
+                  alt=""
+                  aria-hidden="true"
                   fill
                   sizes="(min-width: 768px) 45vw, 100vw"
                   className={cn(

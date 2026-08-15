@@ -138,7 +138,12 @@ once its outcome lands in Completed or Architecture Decisions.
   slide is mounted, so every 5.5 s rotation would fetch that portrait on
   arrival and visibly pop. The **detail pane keeps `AnimatePresence`** and its
   slide-x motion; only the image layer changed. Cost: `/` First Load JS
-  165 kB -> 168 kB (the `next/link` + `Button` for "Meet the team").
+  165 kB -> 168 kB (the `next/link` + `Button` for "Meet the team"). **All five
+  carry `alt="" aria-hidden="true"`** — `opacity-0` does not remove an element
+  from the accessibility tree, so naming them announced four hidden doctors
+  plus a duplicate of the active one. The overlay and the detail pane already
+  name the active doctor in text. The `/doctors` profile portraits keep real
+  `alt` text: there is one per profile and only one is ever shown.
 - **The slug union is generated from the treatment data.** `lib/data/site.ts`
   declares `treatments` `as const satisfies readonly Treatment[]` — `satisfies`
   type-checks each entry, `as const` keeps each `slug` literal. `TreatmentSlug`,
