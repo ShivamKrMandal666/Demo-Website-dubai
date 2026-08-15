@@ -7,6 +7,7 @@ import { Footer } from "@/components/site/Footer";
 import { MapSection } from "@/components/home/MapSection";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger } from "@/components/site/Reveal";
+import { FadeUp } from "@/components/site/FadeUp";
 import { TreatmentGridCard } from "@/components/treatments/TreatmentGridCard";
 import { treatments } from "@/lib/data/site";
 import { backgrounds, textures } from "@/lib/images";
@@ -34,22 +35,24 @@ export default function TreatmentsPage() {
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
+          {/* Above the fold, so the entrance is CSS `FadeUp`, not Motion
+              `Reveal` — see the note in components/site/FadeUp.tsx. */}
           <div className="container relative z-10 mx-auto">
-            <Reveal>
+            <FadeUp>
               <SectionLabel onDark>Our Treatments</SectionLabel>
-            </Reveal>
-            <Reveal delay={0.08}>
+            </FadeUp>
+            <FadeUp delay={80}>
               <h1 className="mt-6 max-w-3xl font-serif text-4xl leading-[1.05] tracking-editorial text-bone text-balance sm:text-5xl lg:text-6xl">
                 Treatments &amp; therapies, crafted around you
               </h1>
-            </Reveal>
-            <Reveal delay={0.16}>
+            </FadeUp>
+            <FadeUp delay={160}>
               <p className="mt-6 max-w-xl font-sans text-base leading-relaxed text-bone/80 sm:text-lg">
                 A complete menu of medical-grade aesthetic treatments — each tailored,
                 evidence-led and delivered with an unhurried, couture approach.
               </p>
-            </Reveal>
-            <Reveal delay={0.24}>
+            </FadeUp>
+            <FadeUp delay={240}>
               <div className="mt-8 flex flex-wrap gap-4">
                 <ToastButton
                   title={BOOKING_TOAST.title}
@@ -64,7 +67,7 @@ export default function TreatmentsPage() {
                   Explore the menu
                 </ScrollButton>
               </div>
-            </Reveal>
+            </FadeUp>
           </div>
         </section>
 

@@ -48,6 +48,11 @@ export interface TimelinePhase {
 /** Width of the card on the Treatments page md 6-column grid. */
 export type TreatmentSpan = 2 | 3 | 4;
 
+/**
+ * Shape of one treatment. The arrays are `readonly` so the `treatments` literal
+ * below can be declared `as const` — that is what preserves the slug literals
+ * and lets `TreatmentSlug` be derived from the data instead of hand-listed.
+ */
 export interface Treatment {
   n: number;
   slug: string;
@@ -60,8 +65,8 @@ export interface Treatment {
   results: string;
   overview: string;
   how: string;
-  benefits: string[];
-  timeline: TimelinePhase[];
+  benefits: readonly string[];
+  timeline: readonly TimelinePhase[];
   /** Appears in the Home "Signature Treatments" section. */
   home: boolean;
   span: TreatmentSpan;
@@ -110,7 +115,13 @@ export const navLinks: NavLink[] = [
 // The 10 treatments. `home: true` items appear in the Home "Signature
 // Treatments" section (reusing the same generated card images). `span` drives
 // the varied (non-uniform) grid on the Treatments page (md 6-col grid).
-export const treatments: Treatment[] = [
+//
+// `as const satisfies` rather than `: Treatment[]`: `satisfies` still type-checks
+// every entry against Treatment, but `as const` keeps each `slug` as a literal,
+// so TreatmentSlug / treatmentSlugs below are generated from this array. Adding,
+// removing or renaming a treatment therefore updates the slug union, the static
+// route list and the image-map exhaustiveness check in lib/images.ts by itself.
+export const treatments = [
   {
     n: 1,
     slug: "injectables-fillers",
@@ -391,9 +402,22 @@ export const treatments: Treatment[] = [
     home: false,
     span: 3,
   },
-];
+] as const satisfies readonly Treatment[];
 
-export const getTreatmentBySlug = (slug: string): Treatment | undefined =>
+/**
+ * A treatment as it actually exists in the data. Same fields as `Treatment`, but
+ * `slug` is the literal union rather than `string` — use this for anything that
+ * feeds `treatmentCardImage` / `treatmentHeroImage`.
+ */
+export type TreatmentRecord = (typeof treatments)[number];
+
+/** The ten slugs, as a union. Generated — never hand-edit. */
+export type TreatmentSlug = TreatmentRecord["slug"];
+
+/** The ten slugs, as a list. Drives `generateStaticParams` for the detail route. */
+export const treatmentSlugs: readonly TreatmentSlug[] = treatments.map((t) => t.slug);
+
+export const getTreatmentBySlug = (slug: string): TreatmentRecord | undefined =>
   treatments.find((t) => t.slug === slug);
 
 export const doctors: Doctor[] = [

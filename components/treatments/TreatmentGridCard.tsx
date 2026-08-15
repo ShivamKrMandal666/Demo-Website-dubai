@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RevealItem } from "@/components/site/Reveal";
 import { treatmentCardImage } from "@/lib/images";
-import type { Treatment, TreatmentSpan } from "@/lib/data/site";
+import type { TreatmentRecord, TreatmentSpan } from "@/lib/data/site";
 
 // Non-uniform grid card for the Treatments page. `span` drives width on the
 // md 6-col grid; aspect ratio varies with it so the layout never looks flat.
@@ -25,7 +25,7 @@ const sizesClass: Record<TreatmentSpan, string> = {
   4: "(min-width: 768px) 66vw, (min-width: 640px) 50vw, 100vw",
 };
 
-export const TreatmentGridCard = ({ t }: { t: Treatment }) => (
+export const TreatmentGridCard = ({ t }: { t: TreatmentRecord }) => (
   <RevealItem className={cn("h-full", spanClass[t.span] || "md:col-span-2")}>
     <Link
       href={`/treatments/${t.slug}`}

@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Menu } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-// The mobile menu is the only thing on the site that uses Radix Dialog, and it
-// starts closed on every route. Loading it on demand keeps
-// @radix-ui/react-dialog out of the initial bundle; `ssr: false` is safe
-// because a closed Sheet renders nothing but its trigger, which lives below.
+// The mobile menu panel is the only thing on the site that uses Radix Dialog,
+// and it is closed on first paint of every route, so it loads on demand and
+// @radix-ui/react-dialog stays out of the initial bundle. `ssr: false` is safe
+// because a closed Sheet renders no DOM at all — and the trigger it used to
+// own now lives in this file, so the mobile nav affordance is in the
+// server-rendered HTML rather than appearing only after hydration.
 const MobileMenu = dynamic(
   () => import("@/components/site/MobileMenu").then((m) => m.MobileMenu),
   { ssr: false },
@@ -47,6 +49,10 @@ const NavLink = ({ link, scrolled, onNavigate }: NavLinkProps) => (
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Gate on the panel chunk: false until we deliberately fetch it, so the
+  // dynamic import is not part of the hydration critical path.
+  const [panelReady, setPanelReady] = useState(false);
   const handleNavigate = useSiteNav();
 
   useEffect(() => {
@@ -55,6 +61,25 @@ export const Navbar = () => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Warm the panel chunk once the main thread is idle, so the first tap on the
+  // trigger opens instantly instead of waiting on a network round trip.
+  useEffect(() => {
+    const warm = () => setPanelReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(warm, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(warm, 2000);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  // If the tap beats the idle callback, load the chunk now — `open` is already
+  // true, so the Sheet opens the moment the module resolves.
+  const openMenu = () => {
+    setPanelReady(true);
+    setMenuOpen(true);
+  };
 
   const handleBook = () =>
     toast("Booking request received", {
@@ -123,8 +148,27 @@ export const Navbar = () => {
             <ArrowUpRight className="h-4 w-4" />
           </Button>
 
-          {/* Mobile menu — code-split, see the import at the top of the file */}
-          <MobileMenu scrolled={scrolled} onNavigate={handleNavigate} />
+          {/* Mobile menu trigger. Rendered here, not in MobileMenu, so it is
+              present in the server-rendered HTML — see the import comment. */}
+          <button
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            onClick={openMenu}
+            className={cn(
+              "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden",
+              scrolled
+                ? "border-border text-foreground hover:bg-muted"
+                : "border-bone/40 text-bone hover:bg-bone/10",
+            )}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          {/* The panel itself — code-split, see the import at the top. */}
+          {panelReady && (
+            <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} onNavigate={handleNavigate} />
+          )}
         </div>
       </nav>
     </header>

@@ -14,12 +14,14 @@
 //     were re-encoding *upscaled* images — a 900px card was being served at
 //     3840px, and texture-treatments.jpg grew from 239 KB to 308 KB. Static
 //     imports cap the srcset at the real width.
-//  2. The slug -> image link is now checked at compile time. `treatmentSlugs`
-//     used to be a hand-maintained list that nothing tied to the `treatments`
-//     data or to the files on disk; a typo failed silently at runtime. The
-//     Record types below make a missing or misspelled slug a build error.
+//  2. The slug -> image link is checked at compile time. `TreatmentSlug` is
+//     derived from the `treatments` array in lib/data/site.ts, and the Record
+//     types below are keyed by it — so a treatment whose card or hero image is
+//     missing, or whose slug is misspelled, is a build error rather than a
+//     silent runtime undefined.
 // ---------------------------------------------------------------------------
 import type { StaticImageData } from "next/image";
+import type { TreatmentSlug } from "@/lib/data/site";
 
 // -- treatment card images (also reused on the individual detail page) -------
 import cardInjectablesFillers from "@/public/images/treatments/injectables-fillers.jpg";
@@ -56,23 +58,9 @@ import bgTextureTestimonial from "@/public/images/backgrounds/texture-testimonia
 import bgTextureFooter from "@/public/images/backgrounds/texture-footer.jpg";
 import bgCtaBand from "@/public/images/backgrounds/cta-band.jpg";
 
-export const treatmentSlugs = [
-  "injectables-fillers",
-  "laser-skin-resurfacing",
-  "signature-facials",
-  "body-contouring",
-  "regenerative-aesthetics",
-  "skin-boosters-hydration",
-  "thread-lifts",
-  "chemical-peels",
-  "hair-restoration",
-  "facial-contouring-jawline",
-] as const;
-
-export type TreatmentSlug = (typeof treatmentSlugs)[number];
-
-// Both maps are keyed by TreatmentSlug, so adding a slug above without adding
-// its two images — or misspelling either — fails `npm run typecheck`.
+// Both maps are keyed by TreatmentSlug, so adding a treatment to lib/data/site.ts
+// without adding its two images — or misspelling either — fails
+// `npm run typecheck`.
 const cardImages: Record<TreatmentSlug, StaticImageData> = {
   "injectables-fillers": cardInjectablesFillers,
   "laser-skin-resurfacing": cardLaserSkinResurfacing,
@@ -100,11 +88,9 @@ const heroImagesBySlug: Record<TreatmentSlug, StaticImageData> = {
 };
 
 // Per-treatment card image (also reused on the individual detail page)
-export const treatmentCardImage = (slug: string): StaticImageData =>
-  cardImages[slug as TreatmentSlug];
+export const treatmentCardImage = (slug: TreatmentSlug): StaticImageData => cardImages[slug];
 // Per-treatment unique detail-page hero background
-export const treatmentHeroImage = (slug: string): StaticImageData =>
-  heroImagesBySlug[slug as TreatmentSlug];
+export const treatmentHeroImage = (slug: TreatmentSlug): StaticImageData => heroImagesBySlug[slug];
 
 export const backgrounds = {
   treatmentsHero: bgTreatmentsHero,

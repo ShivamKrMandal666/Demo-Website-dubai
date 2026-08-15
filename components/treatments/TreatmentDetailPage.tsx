@@ -16,6 +16,7 @@ import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
+import { FadeUp } from "@/components/site/FadeUp";
 import { getTreatmentBySlug, treatments } from "@/lib/data/site";
 import { treatmentCardImage, treatmentHeroImage } from "@/lib/images";
 
@@ -56,28 +57,30 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
+          {/* Above the fold, so the entrance is CSS `FadeUp`, not Motion
+              `Reveal` — see the note in components/site/FadeUp.tsx. */}
           <div className="container relative z-10 mx-auto">
-            <Reveal>
+            <FadeUp>
               <Link
                 href="/treatments"
                 className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.2em] text-bone/70 transition-colors hover:text-gold"
               >
                 <ArrowLeft className="h-4 w-4" /> All Treatments
               </Link>
-            </Reveal>
-            <Reveal delay={0.06} className="mt-5">
+            </FadeUp>
+            <FadeUp delay={60} className="mt-5">
               <SectionLabel onDark>Treatment</SectionLabel>
-            </Reveal>
-            <Reveal delay={0.12}>
+            </FadeUp>
+            <FadeUp delay={120}>
               <h1 className="mt-5 max-w-3xl font-serif text-4xl leading-[1.05] tracking-editorial text-bone text-balance sm:text-5xl lg:text-6xl">
                 {t.name}
               </h1>
-            </Reveal>
-            <Reveal delay={0.18}>
+            </FadeUp>
+            <FadeUp delay={180}>
               <p className="mt-5 max-w-xl font-sans text-base leading-relaxed text-bone/80 sm:text-lg">
                 {t.tagline}
               </p>
-            </Reveal>
+            </FadeUp>
           </div>
         </section>
 
@@ -86,11 +89,12 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
           <div className="container mx-auto">
             <Reveal y={40}>
               <div className="relative mx-auto aspect-[16/10] max-w-3xl overflow-hidden rounded-3xl border border-border bg-card shadow-elegant">
+                {/* Not `priority` — the hero above is this route's declared LCP
+                    element, and a second preload only competes with it. */}
                 <Image
                   src={treatmentCardImage(t.slug)}
                   alt={t.name}
                   fill
-                  priority
                   sizes="(min-width: 768px) 48rem, 100vw"
                   className="object-cover"
                 />

@@ -1,13 +1,11 @@
 "use client";
 
-import { Menu, ArrowUpRight, Phone } from "lucide-react";
+import { ArrowUpRight, Phone } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetTrigger,
   SheetClose,
   SheetHeader,
   SheetTitle,
@@ -15,34 +13,24 @@ import {
 import { BOOKING_TOAST } from "@/components/site/ToastButton";
 import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/site";
 
-// Split out of Navbar so `@radix-ui/react-dialog` can be code-split behind a
-// dynamic import — it is the only consumer of Radix on the whole site, and the
-// menu is closed on first paint of every route. Markup is unchanged from when
-// this lived inline in Navbar.
+// The sliding panel only — `@radix-ui/react-dialog` is the sole Radix consumer
+// on the site, so it is code-split behind Navbar's dynamic import. The trigger
+// deliberately lives in Navbar instead of here: a `ssr: false` chunk renders
+// nothing on the server, and the mobile nav affordance has to be in the
+// prerendered HTML. Navbar owns the open state and passes it down.
 export const MobileMenu = ({
-  scrolled,
+  open,
+  onOpenChange,
   onNavigate,
 }: {
-  scrolled: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onNavigate: (link: NavLinkType) => void;
 }) => {
   const handleBook = () => toast(BOOKING_TOAST.title, { description: BOOKING_TOAST.description });
 
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <button
-          aria-label="Open menu"
-          className={cn(
-            "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden",
-            scrolled
-              ? "border-border text-foreground hover:bg-muted"
-              : "border-bone/40 text-bone hover:bg-bone/10",
-          )}
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-      </SheetTrigger>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[85vw] max-w-sm border-border bg-background">
         <SheetHeader>
           <SheetTitle className="text-left font-serif text-2xl text-foreground">

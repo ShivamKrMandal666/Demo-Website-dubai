@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import * as m from "motion/react-m";
 import { ArrowUpRight, Award, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -10,8 +9,6 @@ import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { heroImages } from "@/lib/images";
 import { scrollToId } from "@/lib/smooth-scroll";
-
-const EASE = [0.22, 1, 0.36, 1] as const;
 
 export const Hero = () => {
   const [active, setActive] = useState(0);
@@ -80,35 +77,35 @@ export const Hero = () => {
       {/* 30% — Content */}
       <div className="container relative z-20 mx-auto flex h-full flex-col justify-center">
         <div className="max-w-2xl">
-          <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE }}>
+          {/* Entrance is CSS (`animate-fade-up`), not Motion. Motion's
+              `initial` ships as inline `opacity:0` in the prerendered HTML and
+              only clears on hydration, which left this whole block — including
+              the <h1> that is this route's LCP element — invisible until React
+              booted. The keyframe uses the same easing curve, so the animation
+              looks identical; only its start time moves to first paint. */}
+          <div className="animate-fade-up">
             <SectionLabel onDark>Aesthetic &amp; Cosmetic Artistry</SectionLabel>
-          </m.div>
+          </div>
 
-          <m.h1
-            initial={{ opacity: 0, y: 26 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.12, ease: EASE }}
-            className="mt-6 font-serif text-4xl leading-[1.04] tracking-editorial text-bone text-balance sm:text-5xl lg:text-6xl"
+          <h1
+            style={{ animationDelay: "120ms" }}
+            className="animate-fade-up mt-6 font-serif text-4xl leading-[1.04] tracking-editorial text-bone text-balance sm:text-5xl lg:text-6xl"
           >
             Where science meets the art of{" "}
             <span className="italic text-gold">natural</span> beauty
-          </m.h1>
+          </h1>
 
-          <m.p
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.24, ease: EASE }}
-            className="mt-6 max-w-lg font-sans text-base leading-relaxed text-bone/80 sm:text-lg"
+          <p
+            style={{ animationDelay: "240ms" }}
+            className="animate-fade-up mt-6 max-w-lg font-sans text-base leading-relaxed text-bone/80 sm:text-lg"
           >
             A private clinic where medical precision and quiet luxury restore
             confidence — one refined, unhurried result at a time.
-          </m.p>
+          </p>
 
-          <m.div
-            initial={{ opacity: 0, y: 22 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.36, ease: EASE }}
-            className="mt-9 flex flex-wrap items-center gap-4"
+          <div
+            style={{ animationDelay: "360ms" }}
+            className="animate-fade-up mt-9 flex flex-wrap items-center gap-4"
           >
             <Button onClick={handleBook} variant="gold" size="xl" className="rounded-full">
               Book an Appointment
@@ -117,7 +114,7 @@ export const Hero = () => {
             <Button onClick={() => scrollToId("#treatments")} variant="hero" size="xl" className="rounded-full">
               Explore Treatments
             </Button>
-          </m.div>
+          </div>
 
           {/* Slide indicators */}
           <div className="mt-12 flex items-center gap-3">
@@ -143,11 +140,9 @@ export const Hero = () => {
       </div>
 
       {/* 10% — Trust marker / award badge */}
-      <m.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.5, ease: EASE }}
-        className="absolute bottom-8 right-5 z-20 hidden sm:block md:bottom-12 md:right-10"
+      <div
+        style={{ animationDelay: "500ms" }}
+        className="animate-fade-up absolute bottom-8 right-5 z-20 hidden sm:block md:bottom-12 md:right-10"
       >
         <div className="flex items-center gap-4 rounded-2xl border border-bone/20 bg-espresso-deep/45 px-5 py-4 backdrop-blur-md">
           <Award className="h-9 w-9 shrink-0 text-gold" />
@@ -158,7 +153,7 @@ export const Hero = () => {
             </p>
           </div>
         </div>
-      </m.div>
+      </div>
 
       {/* Scroll cue */}
       <div className="absolute bottom-7 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex">

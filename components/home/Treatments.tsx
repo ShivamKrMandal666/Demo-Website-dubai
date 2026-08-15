@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
-import { treatments, type Treatment } from "@/lib/data/site";
+import { treatments, type TreatmentRecord } from "@/lib/data/site";
 import { treatmentCardImage, textures } from "@/lib/images";
 
 // The five treatments flagged `home: true` — the same generated card images
@@ -27,7 +27,7 @@ const TreatmentCard = ({
   className,
   sizes,
 }: {
-  t: Treatment;
+  t: TreatmentRecord;
   className?: string;
   sizes: string;
 }) => (

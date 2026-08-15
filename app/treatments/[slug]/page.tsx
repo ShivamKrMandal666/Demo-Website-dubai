@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import TreatmentDetailPage from "@/components/treatments/TreatmentDetailPage";
-import { clinic, getTreatmentBySlug } from "@/lib/data/site";
-import { treatmentSlugs } from "@/lib/images";
+import { clinic, getTreatmentBySlug, treatmentSlugs } from "@/lib/data/site";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
