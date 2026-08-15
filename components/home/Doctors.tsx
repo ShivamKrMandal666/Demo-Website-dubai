@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence } from "motion/react";
+import * as m from "motion/react-m";
 import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionLabel } from "@/components/site/SectionLabel";
@@ -55,7 +56,7 @@ export const Doctors = () => {
             <div className="pointer-events-none absolute -left-3 -top-3 h-full w-full rounded-2xl border border-gold/25" aria-hidden="true" />
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-bone/15 bg-espresso-deep/60">
               <AnimatePresence mode="wait" custom={dir}>
-                <motion.div
+                <m.div
                   key={doc.name}
                   custom={dir}
                   variants={slide}
@@ -74,7 +75,7 @@ export const Doctors = () => {
                       Portrait image
                     </span>
                   </div>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
               {/* name overlay */}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-espresso-deep/90 to-transparent p-6">
@@ -87,7 +88,7 @@ export const Doctors = () => {
           {/* Details */}
           <div className="min-h-[300px]">
             <AnimatePresence mode="wait" custom={dir}>
-              <motion.div
+              <m.div
                 key={doc.name}
                 custom={dir}
                 variants={slide}
@@ -109,7 +110,7 @@ export const Doctors = () => {
                     </span>
                   ))}
                 </div>
-              </motion.div>
+              </m.div>
             </AnimatePresence>
 
             {/* Controls + progress */}
@@ -149,7 +150,7 @@ export const Doctors = () => {
 
             {/* thin timer bar */}
             <div className="mt-5 h-px w-full max-w-xs overflow-hidden bg-bone/15">
-              <motion.div
+              <m.div
                 key={active}
                 className="h-full bg-gold/80"
                 initial={{ width: "0%" }}

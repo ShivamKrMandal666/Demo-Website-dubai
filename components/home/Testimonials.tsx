@@ -1,9 +1,7 @@
-"use client";
-
+import Image from "next/image";
 import { Star, ExternalLink, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { ToastButton } from "@/components/site/ToastButton";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
 import { testimonials, googleRating } from "@/lib/data/site";
@@ -29,11 +27,9 @@ const Stars = ({ value = 5, className }: { value?: number; className?: string })
 export const Testimonials = () => (
   <section id="testimonials" className="relative overflow-hidden py-24 md:py-32">
     {/* travertine background behind an inset content block */}
-    <div
-      className="absolute inset-0 bg-cover bg-center"
-      style={{ backgroundImage: `url(${textures.testimonial})` }}
-      aria-hidden="true"
-    />
+    <div className="absolute inset-0" aria-hidden="true">
+      <Image src={textures.testimonial} alt="" fill sizes="100vw" className="object-cover" />
+    </div>
     <div className="absolute inset-0 bg-gradient-fade-bone" aria-hidden="true" />
 
     <div className="container relative z-10 mx-auto">
@@ -62,15 +58,16 @@ export const Testimonials = () => (
                 </p>
               </div>
             </div>
-            <Button
-              onClick={() => toast("Opening Google Reviews", { description: "Live link will be connected shortly." })}
+            <ToastButton
+              title="Opening Google Reviews"
+              description="Live link will be connected shortly."
               variant="outlineSage"
               size="lg"
               className="rounded-full"
             >
               View on Google
               <ExternalLink className="h-4 w-4" />
-            </Button>
+            </ToastButton>
           </div>
         </Reveal>
 

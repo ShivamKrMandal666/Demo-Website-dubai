@@ -1,5 +1,4 @@
-"use client";
-
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -11,26 +10,26 @@ import {
   Sparkles,
   TrendingUp,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ToastButton, BOOKING_TOAST } from "@/components/site/ToastButton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
+import { FadeUp } from "@/components/site/FadeUp";
 import { getTreatmentBySlug, treatments } from "@/lib/data/site";
 import { treatmentCardImage, treatmentHeroImage } from "@/lib/images";
 
-// PARKED — not routed yet. See components/treatments/README.md.
-// When routed as app/treatments/[slug]/page.tsx, replace the `null` return
-// below with `notFound()`.
+// One template for all ten treatments — everything on the page is driven by
+// the Treatment record for `slug`. Rendered by app/treatments/[slug]/page.tsx,
+// which calls notFound() for an unknown slug before this ever mounts; the
+// guard below only narrows the type.
 export default function TreatmentDetailPage({ slug }: { slug: string }) {
   const t = getTreatmentBySlug(slug);
   if (!t) return null;
 
-  const book = () =>
-    toast("Booking request received", {
-      description: `We'll confirm your ${t.name} consultation shortly.`,
-    });
+  // Same headline as everywhere else, but the second line names the treatment.
+  const bookDescription = `We'll confirm your ${t.name} consultation shortly.`;
 
   const others = treatments.filter((x) => x.slug !== t.slug).slice(0, 3);
   const facts = [
@@ -46,34 +45,42 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
       <main>
         {/* Hero — unique background per treatment */}
         <section id="top" className="relative flex h-[60vh] min-h-[440px] items-center overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center animate-kenburns"
-            style={{ backgroundImage: `url(${treatmentHeroImage(t.slug)})` }}
+          {/* LCP element for this route — fetched eagerly. */}
+          <Image
+            src={treatmentHeroImage(t.slug)}
+            alt=""
+            aria-hidden="true"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
+          {/* Above the fold, so the entrance is CSS `FadeUp`, not Motion
+              `Reveal` — see the note in components/site/FadeUp.tsx. */}
           <div className="container relative z-10 mx-auto">
-            <Reveal>
+            <FadeUp>
               <Link
                 href="/treatments"
                 className="inline-flex items-center gap-2 font-sans text-xs uppercase tracking-[0.2em] text-bone/70 transition-colors hover:text-gold"
               >
                 <ArrowLeft className="h-4 w-4" /> All Treatments
               </Link>
-            </Reveal>
-            <Reveal delay={0.06} className="mt-5">
+            </FadeUp>
+            <FadeUp delay={60} className="mt-5">
               <SectionLabel onDark>Treatment</SectionLabel>
-            </Reveal>
-            <Reveal delay={0.12}>
+            </FadeUp>
+            <FadeUp delay={120}>
               <h1 className="mt-5 max-w-3xl font-serif text-4xl leading-[1.05] tracking-editorial text-bone text-balance sm:text-5xl lg:text-6xl">
                 {t.name}
               </h1>
-            </Reveal>
-            <Reveal delay={0.18}>
+            </FadeUp>
+            <FadeUp delay={180}>
               <p className="mt-5 max-w-xl font-sans text-base leading-relaxed text-bone/80 sm:text-lg">
                 {t.tagline}
               </p>
-            </Reveal>
+            </FadeUp>
           </div>
         </section>
 
@@ -81,12 +88,15 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
         <section className="relative z-10 -mt-16 md:-mt-24">
           <div className="container mx-auto">
             <Reveal y={40}>
-              <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl border border-border shadow-elegant">
-                {/* eslint-disable-next-line @next/next/no-img-element -- revisit with next/image when this page is routed */}
-                <img
+              <div className="relative mx-auto aspect-[16/10] max-w-3xl overflow-hidden rounded-3xl border border-border bg-card shadow-elegant">
+                {/* Not `priority` — the hero above is this route's declared LCP
+                    element, and a second preload only competes with it. */}
+                <Image
                   src={treatmentCardImage(t.slug)}
                   alt={t.name}
-                  className="aspect-[16/10] w-full object-cover"
+                  fill
+                  sizes="(min-width: 768px) 48rem, 100vw"
+                  className="object-cover"
                 />
               </div>
             </Reveal>
@@ -162,9 +172,15 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                         </div>
                       ))}
                     </div>
-                    <Button onClick={book} variant="gold" size="lg" className="mt-7 w-full rounded-full">
+                    <ToastButton
+                      title={BOOKING_TOAST.title}
+                      description={bookDescription}
+                      variant="gold"
+                      size="lg"
+                      className="mt-7 w-full rounded-full"
+                    >
                       Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                    </Button>
+                    </ToastButton>
                   </div>
                 </Reveal>
               </div>
@@ -203,9 +219,12 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
 
         {/* CTA band over the treatment's hero image */}
         <section className="relative overflow-hidden">
+          {/* Stays a CSS background on purpose: `bg-fixed` (the desktop
+              parallax) has no next/image equivalent. Same file as the hero
+              above, so it is already in cache by the time this scrolls in. */}
           <div
             className="absolute inset-0 bg-cover bg-center md:bg-fixed"
-            style={{ backgroundImage: `url(${treatmentHeroImage(t.slug)})` }}
+            style={{ backgroundImage: `url(${treatmentHeroImage(t.slug).src})` }}
             aria-hidden="true"
           />
           <div className="absolute inset-0 bg-espresso-deep/75" aria-hidden="true" />
@@ -227,9 +246,15 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                 </p>
               </Reveal>
               <Reveal delay={0.15}>
-                <Button onClick={book} variant="gold" size="xl" className="mt-8 rounded-full">
+                <ToastButton
+                  title={BOOKING_TOAST.title}
+                  description={bookDescription}
+                  variant="gold"
+                  size="xl"
+                  className="mt-8 rounded-full"
+                >
                   Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                </Button>
+                </ToastButton>
               </Reveal>
             </div>
           </div>
@@ -257,12 +282,12 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- revisit with next/image when this page is routed */}
-                      <img
+                      <Image
                         src={treatmentCardImage(o.slug)}
                         alt={o.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        fill
+                        sizes="(min-width: 640px) 33vw, 100vw"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                       />
                     </div>
                     <div className="flex flex-1 flex-col p-5">
@@ -279,8 +304,8 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
           </div>
         </section>
 
-        <Footer />
       </main>
+      <Footer />
     </div>
   );
 }

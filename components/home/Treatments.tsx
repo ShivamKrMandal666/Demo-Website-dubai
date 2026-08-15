@@ -1,26 +1,54 @@
-import { ImageIcon, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
-import { treatments, type Treatment } from "@/lib/data/site";
-import { textures } from "@/lib/images";
+import { treatments, type TreatmentRecord } from "@/lib/data/site";
+import { treatmentCardImage, textures } from "@/lib/images";
 
-const TreatmentCard = ({ t, className }: { t: Treatment; className?: string }) => (
+// The five treatments flagged `home: true` — the same generated card images
+// the Treatments page uses, no separate asset set.
+const homeTreatments = treatments.filter((t) => t.home);
+
+// Bento placement, index-aligned with `homeTreatments`. The first card is the
+// feature (2×2); the last spans two columns. `sizes` follows the span so the
+// browser never downloads a 66vw image for a 33vw slot.
+const bento: { className?: string; sizes: string }[] = [
+  { className: "md:col-span-2 md:row-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
+  { sizes: "(min-width: 768px) 33vw, 100vw" },
+  { sizes: "(min-width: 768px) 33vw, 100vw" },
+  { sizes: "(min-width: 768px) 33vw, 100vw" },
+  { className: "md:col-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
+];
+
+const TreatmentCard = ({
+  t,
+  className,
+  sizes,
+}: {
+  t: TreatmentRecord;
+  className?: string;
+  sizes: string;
+}) => (
   <RevealItem className={cn("h-full", className)}>
-    <article
-      className={cn(
-        "group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant",
-      )}
+    <Link
+      href={`/treatments/${t.slug}`}
+      className="group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
     >
-      {/* Placeholder image area (client-supplied foreground) */}
-      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-gradient-to-br from-primary/10 via-muted to-accent/15 p-6">
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-foreground/15 px-7 py-8 text-center">
-          <ImageIcon className="h-6 w-6 text-primary/55" />
-          <span className="font-sans text-[0.66rem] uppercase tracking-[0.2em] text-muted-foreground">
-            Treatment image
-          </span>
-        </div>
-        <span className="absolute left-5 top-4 font-serif text-sm text-foreground/40">
+      <div className="relative flex-1 overflow-hidden">
+        <Image
+          src={treatmentCardImage(t.slug)}
+          alt={t.name}
+          fill
+          sizes={sizes}
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-espresso-deep/55 via-transparent to-transparent"
+          aria-hidden="true"
+        />
+        <span className="absolute left-5 top-4 rounded-full bg-espresso-deep/45 px-2.5 py-1 font-serif text-xs text-bone/90 backdrop-blur-sm">
           {String(t.n).padStart(2, "0")}
         </span>
       </div>
@@ -33,18 +61,16 @@ const TreatmentCard = ({ t, className }: { t: Treatment; className?: string }) =
           <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
         </span>
       </div>
-    </article>
+    </Link>
   </RevealItem>
 );
 
 export const Treatments = () => (
   <section id="treatments" className="relative overflow-hidden py-24 md:py-32">
     {/* subtle linen texture background */}
-    <div
-      className="absolute inset-0 bg-muted bg-cover bg-center opacity-60"
-      style={{ backgroundImage: `url(${textures.treatments})` }}
-      aria-hidden="true"
-    />
+    <div className="absolute inset-0 bg-muted opacity-60" aria-hidden="true">
+      <Image src={textures.treatments} alt="" fill sizes="100vw" className="object-cover" />
+    </div>
     <div className="absolute inset-0 bg-background/50" aria-hidden="true" />
 
     <div className="container relative z-10 mx-auto">
@@ -70,12 +96,25 @@ export const Treatments = () => (
         stagger={0.1}
         className="mt-12 grid grid-cols-1 gap-5 md:mt-16 md:grid-cols-3 md:auto-rows-[minmax(0,220px)]"
       >
-        <TreatmentCard t={treatments[0]} className="md:col-span-2 md:row-span-2" />
-        <TreatmentCard t={treatments[1]} />
-        <TreatmentCard t={treatments[2]} />
-        <TreatmentCard t={treatments[3]} />
-        <TreatmentCard t={treatments[4]} className="md:col-span-2" />
+        {homeTreatments.map((t, i) => (
+          <TreatmentCard
+            key={t.slug}
+            t={t}
+            className={bento[i]?.className}
+            sizes={bento[i]?.sizes ?? "(min-width: 768px) 33vw, 100vw"}
+          />
+        ))}
       </RevealStagger>
+
+      <Reveal delay={0.05} className="mt-12 flex justify-center">
+        <Link
+          href="/treatments"
+          className="group inline-flex items-center gap-2 font-sans text-xs font-medium uppercase tracking-[0.18em] text-primary transition-colors duration-300 hover:text-foreground"
+        >
+          View all ten treatments
+          <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+        </Link>
+      </Reveal>
     </div>
   </section>
 );

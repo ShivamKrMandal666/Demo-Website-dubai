@@ -1,9 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { RevealItem } from "@/components/site/Reveal";
 import { treatmentCardImage } from "@/lib/images";
-import type { Treatment, TreatmentSpan } from "@/lib/data/site";
+import type { TreatmentRecord, TreatmentSpan } from "@/lib/data/site";
 
 // Non-uniform grid card for the Treatments page. `span` drives width on the
 // md 6-col grid; aspect ratio varies with it so the layout never looks flat.
@@ -17,20 +18,26 @@ const aspectClass: Record<TreatmentSpan, string> = {
   3: "aspect-[4/3]",
   4: "aspect-[16/10]",
 };
+// Column share of the 6-col md grid, so the browser picks the right source.
+const sizesClass: Record<TreatmentSpan, string> = {
+  2: "(min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw",
+  3: "(min-width: 768px) 50vw, (min-width: 640px) 50vw, 100vw",
+  4: "(min-width: 768px) 66vw, (min-width: 640px) 50vw, 100vw",
+};
 
-export const TreatmentGridCard = ({ t }: { t: Treatment }) => (
+export const TreatmentGridCard = ({ t }: { t: TreatmentRecord }) => (
   <RevealItem className={cn("h-full", spanClass[t.span] || "md:col-span-2")}>
     <Link
       href={`/treatments/${t.slug}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
     >
       <div className={cn("relative overflow-hidden", aspectClass[t.span] || "aspect-square")}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- revisit with next/image when this page is routed */}
-        <img
+        <Image
           src={treatmentCardImage(t.slug)}
           alt={t.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          fill
+          sizes={sizesClass[t.span] || "100vw"}
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-espresso-deep/55 via-transparent to-transparent" />
         <span className="absolute left-5 top-4 rounded-full bg-espresso-deep/45 px-2.5 py-1 font-serif text-xs text-bone/90 backdrop-blur-sm">

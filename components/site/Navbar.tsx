@@ -1,20 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Menu, ArrowUpRight, Phone } from "lucide-react";
+import dynamic from "next/dynamic";
+import { ArrowUpRight, Menu } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+// The mobile menu panel is the only thing on the site that uses Radix Dialog,
+// and it is closed on first paint of every route, so it loads on demand and
+// @radix-ui/react-dialog stays out of the initial bundle. `ssr: false` is safe
+// because a closed Sheet renders no DOM at all — and the trigger it used to
+// own now lives in this file, so the mobile nav affordance is in the
+// server-rendered HTML rather than appearing only after hydration.
+const MobileMenu = dynamic(
+  () => import("@/components/site/MobileMenu").then((m) => m.MobileMenu),
+  { ssr: false },
+);
 import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/site";
-import { scrollToId } from "@/lib/smooth-scroll";
+import { useSiteNav } from "@/lib/use-site-nav";
+
+// The wordmark behaves like the Home nav link: scroll to top when already
+// home, navigate home from anywhere else.
+const homeLink: NavLinkType = { label: "Home", to: "/", scroll: "#top" };
 
 interface NavLinkProps {
   link: NavLinkType;
@@ -42,6 +49,11 @@ const NavLink = ({ link, scrolled, onNavigate }: NavLinkProps) => (
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Gate on the panel chunk: false until we deliberately fetch it, so the
+  // dynamic import is not part of the hydration critical path.
+  const [panelReady, setPanelReady] = useState(false);
+  const handleNavigate = useSiteNav();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -50,14 +62,23 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const handleNavigate = (link: NavLinkType) => {
-    if (link.soon) {
-      toast("Gallery is on its way", {
-        description: "This page is coming soon — check back shortly.",
-      });
-      return;
+  // Warm the panel chunk once the main thread is idle, so the first tap on the
+  // trigger opens instantly instead of waiting on a network round trip.
+  useEffect(() => {
+    const warm = () => setPanelReady(true);
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(warm, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
     }
-    scrollToId(link.scroll);
+    const id = window.setTimeout(warm, 2000);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  // If the tap beats the idle callback, load the chunk now — `open` is already
+  // true, so the Sheet opens the moment the module resolves.
+  const openMenu = () => {
+    setPanelReady(true);
+    setMenuOpen(true);
   };
 
   const handleBook = () =>
@@ -77,7 +98,7 @@ export const Navbar = () => {
       <nav className="container mx-auto flex h-[72px] items-center justify-between">
         {/* Logo placeholder */}
         <button
-          onClick={() => scrollToId("#top")}
+          onClick={() => handleNavigate(homeLink)}
           className="flex items-center gap-3"
           aria-label={clinic.name}
         >
@@ -127,55 +148,27 @@ export const Navbar = () => {
             <ArrowUpRight className="h-4 w-4" />
           </Button>
 
-          {/* Mobile menu */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <button
-                aria-label="Open menu"
-                className={cn(
-                  "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden",
-                  scrolled
-                    ? "border-border text-foreground hover:bg-muted"
-                    : "border-bone/40 text-bone hover:bg-bone/10",
-                )}
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[85vw] max-w-sm border-border bg-background">
-              <SheetHeader>
-                <SheetTitle className="text-left font-serif text-2xl text-foreground">
-                  Maison Lumé
-                </SheetTitle>
-              </SheetHeader>
-              <div className="mt-8 flex flex-col gap-1">
-                {navLinks.map((link) => (
-                  <SheetClose asChild key={link.label}>
-                    <button
-                      onClick={() => handleNavigate(link)}
-                      className="group flex items-center justify-between border-b border-border/60 py-4 text-left font-serif text-xl text-foreground transition-colors hover:text-primary"
-                    >
-                      {link.label}
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </button>
-                  </SheetClose>
-                ))}
-              </div>
-              <div className="mt-8 space-y-4">
-                <SheetClose asChild>
-                  <Button onClick={handleBook} variant="gold" size="lg" className="w-full rounded-full">
-                    Book an Appointment
-                  </Button>
-                </SheetClose>
-                <a
-                  href={`tel:${clinic.phone.replace(/\s/g, "")}`}
-                  className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
-                >
-                  <Phone className="h-4 w-4" /> {clinic.phone}
-                </a>
-              </div>
-            </SheetContent>
-          </Sheet>
+          {/* Mobile menu trigger. Rendered here, not in MobileMenu, so it is
+              present in the server-rendered HTML — see the import comment. */}
+          <button
+            type="button"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            onClick={openMenu}
+            className={cn(
+              "inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 lg:hidden",
+              scrolled
+                ? "border-border text-foreground hover:bg-muted"
+                : "border-bone/40 text-bone hover:bg-bone/10",
+            )}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+
+          {/* The panel itself — code-split, see the import at the top. */}
+          {panelReady && (
+            <MobileMenu open={menuOpen} onOpenChange={setMenuOpen} onNavigate={handleNavigate} />
+          )}
         </div>
       </nav>
     </header>
