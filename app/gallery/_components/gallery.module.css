@@ -1,0 +1,40 @@
+/*
+  Tile entrance, as a CSS keyframe rather than a Motion variant.
+
+  The published component animates each tile in with Motion `initial`/`animate`.
+  Motion serialises `initial` into the prerendered HTML as an inline
+  style="opacity:0" that only clears on hydration — which meant every tile was
+  invisible at first paint, and would have stayed invisible forever if the JS
+  never ran. That is the same regression this site already fixed everywhere
+  else (see components/site/FadeUp.tsx); a keyframe starts at first paint and
+  finishes with or without hydration.
+
+  Scoped to this route by the CSS module hash. Nothing here references a design
+  token, and nothing outside app/gallery/ imports it.
+*/
+
+@keyframes tileIn {
+  from {
+    opacity: 0;
+    transform: scale(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.tile {
+  /* `both` fill mode: tiles stagger via animation-delay, and backwards fill is
+     what holds them at the 0% keyframe during that delay instead of flashing
+     in and back out. Delay is set per tile inline — max 0.25s. */
+  animation: tileIn 0.9s cubic-bezier(0.18, 0.71, 0.11, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

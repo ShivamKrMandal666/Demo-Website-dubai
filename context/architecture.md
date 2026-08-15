@@ -32,5 +32,19 @@ Post-approval additions (not part of the current prototype stack): Supabase (bac
 
 1. No backend calls, database, or persistent storage in the prototype phase
 2. Dummy data lives in code (`lib/data`), never fetched from an external source
-3. Navbar, Footer, and Google Map components are shared and reused identically across all pages, not duplicated
+3. Navbar, Footer, and Google Map components are shared and reused identically across all pages, not duplicated — **except `/gallery`**, see below
 4. All images are compressed/optimized and organized under `public/images/`
+
+## The `/gallery` exception
+
+`/gallery` is specified as a design island: a full-screen infinite drag grid of
+every site image, with none of the shared layout (no Navbar, Footer, Map or
+hero) and none of the design tokens, reachable only via the nav and left via a
+single fixed "Back to site" link. It is the one intentional departure from
+invariant 3 and from the "no hardcoded hex" rule in `code-standards.md`.
+
+The boundary runs both ways and is the point of the thing: `app/gallery/` may
+not import from `components/` or `lib/utils`, and nothing built for it may be
+promoted into either. Its only outward dependencies are `lib/images.ts` and
+`lib/data/site.ts` — content, not design. Everything else, including its own
+class merger and its CSS module, is local to the route.

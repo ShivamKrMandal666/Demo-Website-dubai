@@ -17,7 +17,7 @@ export interface Clinic {
  * Routes that actually exist in the App Router today. Widen this union when a
  * new route ships — never hand a NavLink a string.
  */
-export type SupportedRoute = "/" | "/treatments" | "/doctors";
+export type SupportedRoute = "/" | "/treatments" | "/doctors" | "/gallery";
 
 /**
  * A nav link is either a "coming soon" placeholder, or a real destination that
@@ -122,15 +122,21 @@ export const clinic: Clinic = {
   hours: "Mon – Sat · 9:00 – 19:00",
 };
 
-// Three routes live so far. `Gallery` stays `soon` until its page ships; when
-// it and Contact do, widen `SupportedRoute` and swap them over the same way
-// `Treatments` and `Doctors` were.
+// Every link is live now that /gallery has shipped. Order is deliberate:
+// Gallery sits last because it is a design-isolated full-screen experience
+// (see app/gallery/) rather than another page of the site proper — leaving the
+// site is the point of it, so it reads as the end of the list.
+//
+// This one array is the only place nav order is expressed: Navbar, MobileMenu
+// and the Footer "Explore" column all map over it, so reordering here reorders
+// all three. The `soon` arm of NavLink has no instances at the moment; it stays
+// because it is how the next unbuilt page gets listed without a dead link.
 export const navLinks: NavLink[] = [
   { label: "Home", to: "/", scroll: "#top" },
   { label: "Treatments", to: "/treatments", scroll: "#treatments" },
   { label: "Doctors", to: "/doctors", scroll: "#top" },
-  { label: "Gallery", soon: true },
   { label: "Contact", to: "/", scroll: "#contact" },
+  { label: "Gallery", to: "/gallery", scroll: "#top" },
 ];
 
 // The 10 treatments. `home: true` items appear in the Home "Signature

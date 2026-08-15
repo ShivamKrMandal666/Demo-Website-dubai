@@ -35,8 +35,13 @@ npm run lint
   localization** until explicitly instructed post-approval.
 - Server components by default; `"use client"` only where interactivity
   requires it.
-- The 29 images in `public/images/` are final — never regenerate or
+- The 34 images in `public/images/` are final — never regenerate or
   re-compress them. `lib/images.ts` is the single image manifest: reference
   every path through it, and never inline one in a component.
 - Components come from shadcn/ui (`npx shadcn add <name>`) or Vengeance UI
   (`npx shadcn add @vengeanceui/<name>`).
+- **`app/gallery/` is a deliberate exception to all of the above styling
+  rules** — it is specified as an island with its own design language. It uses
+  no shared component and no design token, and nothing in it may be promoted
+  into `components/` or `app/globals.css`. Read `app/gallery/_components/cx.ts`
+  before changing anything under that route.
