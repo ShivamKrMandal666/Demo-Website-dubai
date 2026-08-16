@@ -131,10 +131,12 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* 10% — Trust marker / award badge */}
+      {/* 10% — Trust marker / award badge. Shifted left of `right-5` /
+          `md:right-10` to clear the fixed StickyContact rail, which sits in
+          this same corner on every page. */}
       <div
         style={{ animationDelay: "500ms" }}
-        className="animate-fade-up absolute bottom-8 right-5 z-20 hidden sm:block md:bottom-12 md:right-10"
+        className="animate-fade-up absolute bottom-8 right-[4.5rem] z-20 hidden sm:block md:bottom-12 md:right-24"
       >
         <div className="flex items-center gap-4 rounded-2xl border border-bone/20 bg-espresso-deep/45 px-5 py-4 backdrop-blur-md">
           <Award className="h-9 w-9 shrink-0 text-gold" />

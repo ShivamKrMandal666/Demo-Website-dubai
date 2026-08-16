@@ -116,6 +116,11 @@ Two families, loaded via `next/font/google` in `app/layout.tsx` and exposed as
 layout. It sits above content but below the navbar (`z-50`). It is what stops
 the flat colours reading as digital.
 
+`StickyContact` (the fixed WhatsApp/phone rail, also root-layout-mounted) is
+`z-40` — under the grain by design, because it must stay under the mobile
+`Sheet` at `z-50`: it renders after `{children}`, so an equal z-index would win
+the tie and float over an open menu.
+
 ---
 
 ## Motion

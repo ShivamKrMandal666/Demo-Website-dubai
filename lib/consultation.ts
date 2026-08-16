@@ -108,3 +108,10 @@ export function bookHref(prefill?: ConsultationPrefill): string {
 
 /** `tel:` needs the separators gone. MobileMenu had this inline; now it doesn't. */
 export const telHref = (phone: string) => `tel:${phone.replace(/[\s()-]/g, "")}`;
+
+/**
+ * `wa.me` takes digits only — no `+`, no separators. `telHref`'s narrower
+ * character class cannot be reused, since the leading `+` has to go too.
+ */
+export const whatsappHref = (phone: string) =>
+  `https://wa.me/${phone.replace(/\D/g, "")}`;

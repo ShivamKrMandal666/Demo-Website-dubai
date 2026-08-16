@@ -7,11 +7,12 @@ once its outcome lands in Completed or Architecture Decisions.
 
 **Prototype.** Every page in the nav is built and live; all five `navLinks`
 entries point at real routes. Nothing in flight. Last verification (2026-08-16,
-after Contact + Book): `typecheck`, `lint`, `build` clean; **19** static pages
-(`/contact` and `/book` both `○`); shared First Load JS still 102 kB; every
-route 200, unknown slug 404s. Form behaviour driven in headless Chrome over
-CDP — validation, focus moves, prefill, success panel, mobile-menu close: all
-green.
+after StickyContact): `typecheck`, `lint`, `build` clean; **19** static pages,
+none dynamic; shared First Load JS still 102 kB. Driven over CDP at 1440x900
+and 390x844 — icons `z-40` / 48px desktop / 44px mobile, absent from `/gallery`
+and back on return, behind the open mobile menu: all green. (Note: headless
+`--window-size` alone does **not** emulate a mobile viewport — it crops a
+desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
 
 ## Completed
 
@@ -29,6 +30,12 @@ green.
 - **Contact (`/contact`) + Book (`/book`)** — one `ConsultationForm` serves
   both; `/book` prefills treatment/doctor from the query string. All 12 booking
   CTAs now link there and read "Book a Consultation"; the booking toast is gone.
+- **Sticky contact icons** — `components/site/StickyContact.tsx`, the first
+  shared chrome mounted in the root layout. WhatsApp (sage) over Phone (gold),
+  fixed bottom-right, `z-40` so the `z-50` mobile Sheet covers it. Excludes
+  `/gallery` by `usePathname` on the widget side (the island may not import from
+  `components/`). New `clinic.whatsapp` placeholder + `whatsappHref()`; the Hero
+  award badge shifted left to clear the rail. Quick contact only — not booking.
 - **Design system** (tokens in `app/globals.css` + `tailwind.config.ts`), **34
   optimized images** (2.8 MB), **performance pass** (First Load JS 201 -> 165 kB).
 
@@ -62,8 +69,9 @@ green.
   while the repo is `Demo-website-dubai` — the phone regex in `lib/consultation.ts`
   is deliberately international so that swap cannot invalidate it. The map is
   still a placeholder with no API key.
-- **`clinic` has no `whatsapp` field**, so the Contact page omits WhatsApp
-  though the prompt asked for it — adding one would be inventing client data.
+- **`clinic.whatsapp` is a placeholder** (`+44 7700 900123`, Ofcom drama range)
+  and must be swapped for the real number. The Contact page still omits WhatsApp
+  from its details list — only the sticky rail exposes it.
 - **`MapSection`'s "Get directions" button has no handler** (`components/home/
   MapSection.tsx:67`). Pre-existing, left alone in this change.
 

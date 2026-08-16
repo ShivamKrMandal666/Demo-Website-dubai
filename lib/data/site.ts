@@ -8,6 +8,8 @@ export interface Clinic {
   tagline: string;
   established: number;
   phone: string;
+  /** Separate from `phone` on purpose — the landline cannot receive WhatsApp. */
+  whatsapp: string;
   email: string;
   address: string;
   hours: string;
@@ -123,6 +125,9 @@ export const clinic: Clinic = {
   tagline: "Aesthetic & Cosmetic Clinic",
   established: 2009,
   phone: "+44 20 7946 0123",
+  // PLACEHOLDER — Ofcom drama-reserved mobile range, unmistakably fake. Swap
+  // for the real number before any of this is shown to a visitor.
+  whatsapp: "+44 7700 900123",
   email: "hello@maisonlume.com",
   address: "24 Marchmont Row, Mayfair, London W1",
   hours: "Mon – Sat · 9:00 – 19:00",

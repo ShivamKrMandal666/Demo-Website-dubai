@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { RouteTransition } from "@/components/site/RouteTransition";
 import { MotionProvider } from "@/components/site/MotionProvider";
+import { StickyContact } from "@/components/site/StickyContact";
 import { clinic } from "@/lib/data/site";
 import "@/app/globals.css";
 
@@ -46,6 +47,10 @@ export default function RootLayout({
         <RouteTransition />
         <div className="grain-overlay" aria-hidden="true" />
         <MotionProvider>{children}</MotionProvider>
+        {/* Outside MotionProvider — it uses no `motion` primitives, so the
+            strict LazyMotion domain stays untouched. After {children} so it
+            lands last in the tab order rather than ahead of the navbar. */}
+        <StickyContact />
         <Toaster position="top-center" />
       </body>
     </html>
