@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
-import { ToastButton, BOOKING_TOAST } from "@/components/site/ToastButton";
+import { BookButton } from "@/components/site/BookButton";
 import { ScrollButton } from "@/components/site/ScrollButton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -12,10 +11,10 @@ import { TreatmentGridCard } from "@/components/treatments/TreatmentGridCard";
 import { treatments } from "@/lib/data/site";
 import { backgrounds, textures } from "@/lib/images";
 
-// Rendered by app/treatments/page.tsx. A server component: the booking toast
-// and the in-page scroll CTA are the only interactive parts, and they live in
-// the ToastButton / ScrollButton client leaves, so none of this markup ships
-// to the browser.
+// Rendered by app/treatments/page.tsx. A server component: the in-page scroll
+// CTA is the only interactive part and lives in the ScrollButton client leaf,
+// so none of this markup ships to the browser. `BookButton` is a plain link, so
+// it stays on the server too.
 export default function TreatmentsPage() {
   return (
     <div className="relative min-h-screen bg-background text-foreground">
@@ -54,15 +53,7 @@ export default function TreatmentsPage() {
             </FadeUp>
             <FadeUp delay={240}>
               <div className="mt-8 flex flex-wrap gap-4">
-                <ToastButton
-                  title={BOOKING_TOAST.title}
-                  description={BOOKING_TOAST.description}
-                  variant="gold"
-                  size="xl"
-                  className="rounded-full"
-                >
-                  Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                </ToastButton>
+                <BookButton variant="gold" size="xl" className="rounded-full" />
                 <ScrollButton to="#treatments" variant="hero" size="xl" className="rounded-full">
                   Explore the menu
                 </ScrollButton>

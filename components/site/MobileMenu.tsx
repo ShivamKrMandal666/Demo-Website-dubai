@@ -1,8 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowUpRight, Phone } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
@@ -10,8 +10,10 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { BOOKING_TOAST } from "@/components/site/ToastButton";
+import { BOOK_CTA_LABEL } from "@/components/site/BookButton";
+import { telHref } from "@/lib/consultation";
 import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/site";
+import { cn } from "@/lib/utils";
 
 // The sliding panel only — `@radix-ui/react-dialog` is the sole Radix consumer
 // on the site, so it is code-split behind Navbar's dynamic import. The trigger
@@ -27,8 +29,6 @@ export const MobileMenu = ({
   onOpenChange: (open: boolean) => void;
   onNavigate: (link: NavLinkType) => void;
 }) => {
-  const handleBook = () => toast(BOOKING_TOAST.title, { description: BOOKING_TOAST.description });
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-[85vw] max-w-sm border-border bg-background">
@@ -51,13 +51,26 @@ export const MobileMenu = ({
           ))}
         </div>
         <div className="mt-8 space-y-4">
+          {/* Not <SheetClose asChild><BookButton/></SheetClose>: SheetClose
+              clones its child through Radix `Slot` to merge onClick and ref,
+              and BookButton forwards neither — the panel would silently stay
+              open over /book, since a client-side navigation does not close a
+              Radix Dialog by itself. `buttonVariants` + Link is the composition
+              that survives being cloned. */}
           <SheetClose asChild>
-            <Button onClick={handleBook} variant="gold" size="lg" className="w-full rounded-full">
-              Book an Appointment
-            </Button>
+            <Link
+              href="/book"
+              className={cn(
+                buttonVariants({ variant: "gold", size: "lg" }),
+                "w-full rounded-full",
+              )}
+            >
+              {BOOK_CTA_LABEL}
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </SheetClose>
           <a
-            href={`tel:${clinic.phone.replace(/\s/g, "")}`}
+            href={telHref(clinic.phone)}
             className="flex items-center justify-center gap-2 text-sm text-muted-foreground"
           >
             <Phone className="h-4 w-4" /> {clinic.phone}

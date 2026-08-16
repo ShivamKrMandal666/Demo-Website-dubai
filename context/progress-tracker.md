@@ -5,12 +5,13 @@ once its outcome lands in Completed or Architecture Decisions.
 
 ## Status
 
-**Prototype.** Home, Treatments (+10 detail pages), Doctors and Gallery are built
-and live. Nothing in flight. Next unit: **Contact** — the last `navLinks` entry
-still pointing at the footer anchor. Last verification (2026-08-15, after
-Gallery): `typecheck`, `lint`, `build` clean; **17** static pages; `/gallery`
-prerendered at 19.8 kB / 181 kB; shared First Load JS 102 kB; all five route
-types 200, unknown slug 404s.
+**Prototype.** Every page in the nav is built and live; all five `navLinks`
+entries point at real routes. Nothing in flight. Last verification (2026-08-16,
+after Contact + Book): `typecheck`, `lint`, `build` clean; **19** static pages
+(`/contact` and `/book` both `○`); shared First Load JS still 102 kB; every
+route 200, unknown slug 404s. Form behaviour driven in headless Chrome over
+CDP — validation, focus moves, prefill, success panel, mobile-menu close: all
+green.
 
 ## Completed
 
@@ -25,19 +26,21 @@ types 200, unknown slug 404s.
 - **Gallery (`/gallery`)** — infinite drag + wheel wall of 8 curated images
   (21st.dev `infinite-drag-scroll`, masonry). Design-isolated: no Navbar, Footer,
   Map, hero, shared component or token. All under `app/gallery/`.
+- **Contact (`/contact`) + Book (`/book`)** — one `ConsultationForm` serves
+  both; `/book` prefills treatment/doctor from the query string. All 12 booking
+  CTAs now link there and read "Book a Consultation"; the booking toast is gone.
 - **Design system** (tokens in `app/globals.css` + `tailwind.config.ts`), **34
   optimized images** (2.8 MB), **performance pass** (First Load JS 201 -> 165 kB).
 
 ## Next Up
 
-1. **Contact page**; then widen `SupportedRoute`
-   (`"/" | "/treatments" | "/doctors" | "/gallery"`) and swap its `navLinks`
-   entry over, the way Doctors moved off `{ to: "/", scroll: "#doctors" }`.
-2. **Lighthouse mobile (median of 3) on `/doctors` and `/gallery`.**
-3. **`/gallery` interactions unexercised** (static layout is verified) — drag
+1. **Lighthouse mobile (median of 3) on `/doctors`, `/gallery`, `/contact`.**
+2. **`/gallery` interactions unexercised** (static layout is verified) — drag
    inertia, wheel handler, `ResizeObserver` re-measure across `md:`, and
    `dragTransition.restDelta: 0` (raise to `0.001` if the inertia rAF never
    idles). **`/doctors` responsive blocks unverified visually** at 375/768/1440.
+3. **The form has no submit target** — it is optimistic-only by design. Wiring
+   it to anything real is post-approval work (see the no-backend ground rule).
 4. Run `/plugin` — the four declared plugins need a repo-trust confirmation.
 
 ## Open Questions
@@ -56,17 +59,41 @@ types 200, unknown slug 404s.
   load delay and ~4.1 s render delay charged to a dozen critical scripts.
 - **`context/ui-context.md` is stale** where it calls the map/footer overlap
   deliberate; that overlap was removed. **`clinic.address` is Mayfair, London**
-  while the repo is `Demo-website-dubai`. The map is a placeholder, booking a
-  sonner toast — no API key or form in the prototype.
+  while the repo is `Demo-website-dubai` — the phone regex in `lib/consultation.ts`
+  is deliberately international so that swap cannot invalidate it. The map is
+  still a placeholder with no API key.
+- **`clinic` has no `whatsapp` field**, so the Contact page omits WhatsApp
+  though the prompt asked for it — adding one would be inventing client data.
+- **`MapSection`'s "Get directions" button has no handler** (`components/home/
+  MapSection.tsx:67`). Pre-existing, left alone in this change.
 
 ## Architecture Decisions
 
 - **Next.js App Router + TypeScript at the repo root** — the FastAPI backend was
   deleted, so nothing justified a monorepo shell.
 - **Page bodies are server components; interactivity lives in client leaves** —
-  `ToastButton` / `ScrollButton` forward every `ButtonProps`; `BOOKING_TOAST` is
-  the one source seven call sites share. `Hero`, `Doctors`, `Navbar`, `Footer`
-  and `Reveal` stay client.
+  `ToastButton` / `ScrollButton` forward every `ButtonProps`. `Hero`, `Doctors`,
+  `Navbar`, `Footer` and `Reveal` stay client. **`BookButton` declares no
+  directive on purpose**: with no hooks it stays on the server for the four
+  server pages and only compiles into the bundle of client parents, so those
+  pages stopped pulling a client leaf — and sonner — into their chunks.
+  `BOOKING_TOAST` is gone; `BOOK_CTA_LABEL` + `bookHref()` are the one source
+  the 12 CTAs share, and `ToastButton` now only stubs genuinely-unbuilt links.
+- **The consultation form is hand-rolled, not react-hook-form + zod** — 7 fields,
+  3 required, no async or cross-field rules and no server schema to share, so
+  the library would have been ~27 kB against a tracked budget. Validation is a
+  pure module (`lib/consultation.ts`) with no React in it, swappable later.
+  **The two dropdowns are native `<select>`s** — a deliberate exception to the
+  shadcn-only rule in AGENTS.md, since shadcn's Select is an ~18–20 kB Radix
+  listbox that replaces a better OS picker on mobile. **`/book` keeps its
+  shorter `h-[42vh]` hero** (the browse routes are `62vh`): it is a task route
+  and a full hero pushes the first field past the fold.
+- **`/book` stays statically prerendered because `useSearchParams` sits under a
+  `<Suspense>` whose fallback is the real form.** Reading the `searchParams`
+  prop instead would make every request dynamic; a skeleton fallback would
+  prerender nothing usable. Unknown slugs resolve to `undefined` via
+  `getTreatmentBySlug`/`getDoctorBySlug` and the select falls back to its
+  placeholder — a bad link is a 200, never an error.
 - **Above-fold entrances are CSS; below-fold reveals stay on Motion.** Motion's
   `initial` serialises as inline `style="opacity:0"` and only clears on hydration,
   which left 39 elements invisible at first paint. `components/site/FadeUp.tsx`

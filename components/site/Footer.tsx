@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Facebook, Youtube, Linkedin, ArrowUpRight, Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Instagram, Facebook, Youtube, Linkedin, Phone, Mail, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { BookButton } from "@/components/site/BookButton";
 import { navLinks, treatments, clinic } from "@/lib/data/site";
 import { useSiteNav } from "@/lib/use-site-nav";
 import { textures } from "@/lib/images";
@@ -23,10 +23,11 @@ export const Footer = () => {
   return (
     // Sits as its own block below the map section — no overlap. The gold
     // hairline plus the top border define the seam against the page above.
-    <footer
-      id="contact"
-      className="relative overflow-hidden border-t border-gold/20 bg-secondary pt-20 shadow-elegant md:pt-28"
-    >
+    // `id="contact"` used to live here, as the target of the Contact nav link
+    // back when there was no Contact page. /contact is a real route now, so the
+    // id has no consumers — and keeping it would put a duplicate `#contact` in
+    // the DOM on the very page that replaced it.
+    <footer className="relative overflow-hidden border-t border-gold/20 bg-secondary pt-20 shadow-elegant md:pt-28">
       {/* espresso texture */}
       <div className="absolute inset-0 opacity-40" aria-hidden="true">
         <Image src={textures.footer} alt="" fill sizes="100vw" className="object-cover" />
@@ -114,14 +115,7 @@ export const Footer = () => {
                 <Clock className="h-4 w-4 shrink-0 text-gold/80" /> {clinic.hours}
               </li>
             </ul>
-            <Button
-              onClick={() => toast("Booking request received", { description: "Our concierge will confirm shortly." })}
-              variant="gold"
-              size="sm"
-              className="mt-6 rounded-full"
-            >
-              Book an Appointment <ArrowUpRight className="h-4 w-4" />
-            </Button>
+            <BookButton variant="gold" size="sm" className="mt-6 rounded-full" />
           </div>
         </div>
 

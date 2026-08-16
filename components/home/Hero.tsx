@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, Award, ArrowDown } from "lucide-react";
-import { toast } from "sonner";
+import { Award, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { BookButton } from "@/components/site/BookButton";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { heroImages } from "@/lib/images";
 import { scrollToId } from "@/lib/smooth-scroll";
@@ -32,11 +32,6 @@ export const Hero = () => {
     const next = (active + 1) % heroImages.length;
     setWarm((w) => Math.max(w, active, next));
   }, [active]);
-
-  const handleBook = () =>
-    toast("Booking request received", {
-      description: "Our concierge will confirm your appointment shortly.",
-    });
 
   return (
     <section id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
@@ -107,10 +102,7 @@ export const Hero = () => {
             style={{ animationDelay: "360ms" }}
             className="animate-fade-up mt-9 flex flex-wrap items-center gap-4"
           >
-            <Button onClick={handleBook} variant="gold" size="xl" className="rounded-full">
-              Book an Appointment
-              <ArrowUpRight className="h-4 w-4" />
-            </Button>
+            <BookButton variant="gold" size="xl" className="rounded-full" />
             <Button onClick={() => scrollToId("#treatments")} variant="hero" size="xl" className="rounded-full">
               Explore Treatments
             </Button>
