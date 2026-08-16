@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Image from "next/image";
 import { Check } from "lucide-react";
 import { ConsultationForm } from "@/components/consultation/ConsultationForm";
 import { PrefilledConsultationForm } from "@/components/consultation/PrefilledConsultationForm";
@@ -9,6 +8,7 @@ import { MapSection } from "@/components/home/MapSection";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { FadeUp } from "@/components/site/FadeUp";
+import { MediaImage } from "@/components/site/MediaImage";
 import { requestAssurances } from "@/lib/data/consultation";
 import { backgrounds } from "@/lib/images";
 
@@ -25,14 +25,12 @@ export default function BookPage() {
             fold. */}
         <section id="top" className="relative flex h-[42vh] min-h-[340px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
-          <Image
+          <MediaImage
             src={backgrounds.hero1}
             alt=""
-            aria-hidden="true"
-            fill
             priority
             sizes="100vw"
-            className="object-cover bg-center animate-kenburns"
+            className="bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />

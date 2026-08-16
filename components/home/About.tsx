@@ -1,9 +1,10 @@
 import Image from "next/image";
-import { ImageIcon, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { ScrollButton } from "@/components/site/ScrollButton";
-import { textures } from "@/lib/images";
+import { MediaImage } from "@/components/site/MediaImage";
+import { photos, textures } from "@/lib/images";
 
 const stats = [
   { value: "15+", label: "Years of practice" },
@@ -15,7 +16,7 @@ export const About = () => (
   <section id="about" className="relative bg-background py-24 md:py-32">
     <div className="container mx-auto">
       <div className="grid items-center gap-12 md:grid-cols-12 md:gap-16">
-        {/* Foreground image placeholder (client-supplied) */}
+        {/* Foreground image — the clinic exterior */}
         <Reveal x={-30} y={0} className="md:col-span-5">
           <div className="relative">
             {/* offset texture panel for depth */}
@@ -32,11 +33,18 @@ export const About = () => (
               />
             </div>
             <div className="absolute -left-4 -top-4 hidden h-full w-full rounded-2xl bg-primary/10 md:block" aria-hidden="true" />
-            <div className="relative flex aspect-[4/5] flex-col items-center justify-center rounded-2xl border border-dashed border-primary/30 bg-muted/70 shadow-soft">
-              <ImageIcon className="h-8 w-8 text-primary/50" />
-              <span className="mt-3 font-sans text-[0.7rem] uppercase tracking-[0.25em] text-muted-foreground">
-                Foreground image
-              </span>
+            {/* The source is 928x1152 (0.805) against this 4:5 box (0.800), so
+                `object-cover` trims well under a percent off one edge. `eager`
+                rather than `priority`: this is the first image below the fold
+                on `/`, but the hero's <h1> is the route's LCP and a second
+                preload only competes with the stylesheet. */}
+            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border bg-muted shadow-soft">
+              <MediaImage
+                src={photos.clinicExterior}
+                alt="The Maison Lumé Esthétique clinic entrance, lit at dusk"
+                sizes="(min-width: 768px) 42vw, 100vw"
+                eager
+              />
             </div>
             {/* floating accent stat */}
             <div className="absolute -bottom-6 -right-4 rounded-xl bg-secondary px-6 py-4 shadow-elegant md:-right-6">

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { ConsultationForm } from "@/components/consultation/ConsultationForm";
 import { ContactDetails } from "@/components/contact/ContactDetails";
 import { Navbar } from "@/components/site/Navbar";
@@ -8,6 +7,7 @@ import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { FadeUp } from "@/components/site/FadeUp";
 import { ScrollButton } from "@/components/site/ScrollButton";
+import { MediaImage } from "@/components/site/MediaImage";
 import { backgrounds } from "@/lib/images";
 
 // Rendered by app/contact/page.tsx. A server component — the form is the only
@@ -26,14 +26,12 @@ export default function ContactPage() {
             treatments-hero is /treatments). */}
         <section id="top" className="relative flex h-[62vh] min-h-[460px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
-          <Image
+          <MediaImage
             src={backgrounds.hero3}
             alt=""
-            aria-hidden="true"
-            fill
             priority
             sizes="100vw"
-            className="object-cover bg-center animate-kenburns"
+            className="bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />

@@ -47,6 +47,18 @@ export const doctorOptions: readonly SelectOption<DoctorSlug>[] = doctors.map(
 export const RESPONSE_WINDOW_HOURS = 24;
 
 /**
+ * How long the submit button spins before the confirmation panel replaces the
+ * form. There is no backend yet, so this is a deliberate stand-in: without it
+ * the pending state exists but is never seen, and a submit that resolves in the
+ * same frame reads as a button that did not register the click.
+ *
+ * This is the seam a real request drops into — replace the timeout in
+ * ConsultationForm with the `await`, delete this constant, and the UI is
+ * already correct.
+ */
+export const SUBMIT_DELAY_MS = 600;
+
+/**
  * What this flow is and is not. Stated up front on /book because the whole
  * design rests on it: a request, not a confirmed appointment.
  */

@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence } from "motion/react";
 import * as m from "motion/react-m";
@@ -10,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
+import { MediaImage } from "@/components/site/MediaImage";
 import { doctors } from "@/lib/data/site";
 import { doctorPortrait } from "@/lib/images";
 
@@ -70,19 +70,25 @@ export const Doctors = () => {
                   would announce four hidden doctors alongside the active one.
                   The overlay below and the detail pane already name the active
                   doctor in text. */}
+              {/* The crossfade opacity moved from the <img> to a wrapper: a
+                  MediaImage renders its blur layer as a sibling of the image,
+                  so fading only the image would leave five blurs stacked at
+                  full opacity. This is the same wrapper pattern the Hero
+                  slideshow uses. */}
               {doctors.map((d, i) => (
-                <Image
+                <div
                   key={d.slug}
-                  src={doctorPortrait(d.slug)}
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  sizes="(min-width: 768px) 45vw, 100vw"
                   className={cn(
-                    "object-cover transition-opacity duration-700 ease-out",
+                    "absolute inset-0 transition-opacity duration-700 ease-out",
                     i === active ? "opacity-100" : "opacity-0",
                   )}
-                />
+                >
+                  <MediaImage
+                    src={doctorPortrait(d.slug)}
+                    alt=""
+                    sizes="(min-width: 768px) 45vw, 100vw"
+                  />
+                </div>
               ))}
               {/* name overlay */}
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-espresso-deep/90 to-transparent p-6">
