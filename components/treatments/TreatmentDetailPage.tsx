@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowUpRight,
   ArrowLeft,
   ArrowRight,
   Check,
@@ -11,7 +10,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ToastButton, BOOKING_TOAST } from "@/components/site/ToastButton";
+import { BookButton } from "@/components/site/BookButton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { SectionLabel } from "@/components/site/SectionLabel";
@@ -27,9 +26,6 @@ import { treatmentCardImage, treatmentHeroImage } from "@/lib/images";
 export default function TreatmentDetailPage({ slug }: { slug: string }) {
   const t = getTreatmentBySlug(slug);
   if (!t) return null;
-
-  // Same headline as everywhere else, but the second line names the treatment.
-  const bookDescription = `We'll confirm your ${t.name} consultation shortly.`;
 
   const others = treatments.filter((x) => x.slug !== t.slug).slice(0, 3);
   const facts = [
@@ -172,15 +168,14 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                         </div>
                       ))}
                     </div>
-                    <ToastButton
-                      title={BOOKING_TOAST.title}
-                      description={bookDescription}
+                    {/* Carries the slug through, so /book opens with this
+                        treatment already selected. */}
+                    <BookButton
+                      treatment={t.slug}
                       variant="gold"
                       size="lg"
                       className="mt-7 w-full rounded-full"
-                    >
-                      Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                    </ToastButton>
+                    />
                   </div>
                 </Reveal>
               </div>
@@ -246,15 +241,12 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                 </p>
               </Reveal>
               <Reveal delay={0.15}>
-                <ToastButton
-                  title={BOOKING_TOAST.title}
-                  description={bookDescription}
+                <BookButton
+                  treatment={t.slug}
                   variant="gold"
                   size="xl"
                   className="mt-8 rounded-full"
-                >
-                  Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                </ToastButton>
+                />
               </Reveal>
             </div>
           </div>

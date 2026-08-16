@@ -32,9 +32,8 @@ export const ToastButton = ({
   </Button>
 );
 
-// Every "Book an Appointment" button site-wide fires this same toast. Kept in
-// one place so the booking copy cannot drift between the seven call sites.
-export const BOOKING_TOAST = {
-  title: "Booking request received",
-  description: "Our concierge will confirm your appointment shortly.",
-} as const;
+// `BOOKING_TOAST` lived here until booking became a real form. Every booking
+// CTA now goes to /book via `components/site/BookButton.tsx`, and the toast
+// that claimed a request had been received without one being made is gone.
+// What is left uses this for what it was always honest about: a stub for
+// something not wired up yet, like the Google Reviews link.

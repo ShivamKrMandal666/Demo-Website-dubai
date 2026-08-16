@@ -5,9 +5,6 @@ Tailwind CSS + Motion.dev + Lenis**.
 
 ## Read these first
 
-Before implementing anything or making an architectural decision, read the
-context files in this order:
-
 1. `context/project-overview.md` — product definition, goals, features, scope
 2. `context/architecture.md` — system structure, boundaries, invariants
 3. `context/ui-context.md` — theme, colors, typography, motion, components

@@ -8,6 +8,8 @@ export interface Clinic {
   tagline: string;
   established: number;
   phone: string;
+  /** Separate from `phone` on purpose — the landline cannot receive WhatsApp. */
+  whatsapp: string;
   email: string;
   address: string;
   hours: string;
@@ -17,7 +19,13 @@ export interface Clinic {
  * Routes that actually exist in the App Router today. Widen this union when a
  * new route ships — never hand a NavLink a string.
  */
-export type SupportedRoute = "/" | "/treatments" | "/doctors" | "/gallery";
+export type SupportedRoute =
+  | "/"
+  | "/treatments"
+  | "/doctors"
+  | "/contact"
+  | "/gallery"
+  | "/book";
 
 /**
  * A nav link is either a "coming soon" placeholder, or a real destination that
@@ -117,6 +125,9 @@ export const clinic: Clinic = {
   tagline: "Aesthetic & Cosmetic Clinic",
   established: 2009,
   phone: "+44 20 7946 0123",
+  // PLACEHOLDER — Ofcom drama-reserved mobile range, unmistakably fake. Swap
+  // for the real number before any of this is shown to a visitor.
+  whatsapp: "+44 7700 900123",
   email: "hello@maisonlume.com",
   address: "24 Marchmont Row, Mayfair, London W1",
   hours: "Mon – Sat · 9:00 – 19:00",
@@ -131,11 +142,15 @@ export const clinic: Clinic = {
 // and the Footer "Explore" column all map over it, so reordering here reorders
 // all three. The `soon` arm of NavLink has no instances at the moment; it stays
 // because it is how the next unbuilt page gets listed without a dead link.
+//
+// `/book` is deliberately absent: it is a CTA destination, not a section of the
+// site, and listing it would put "Book" directly above the gold Book a
+// Consultation button in both the footer column and the mobile menu.
 export const navLinks: NavLink[] = [
   { label: "Home", to: "/", scroll: "#top" },
   { label: "Treatments", to: "/treatments", scroll: "#treatments" },
   { label: "Doctors", to: "/doctors", scroll: "#top" },
-  { label: "Contact", to: "/", scroll: "#contact" },
+  { label: "Contact", to: "/contact", scroll: "#top" },
   { label: "Gallery", to: "/gallery", scroll: "#top" },
 ];
 
@@ -587,6 +602,13 @@ export type DoctorRecord = (typeof doctors)[number];
 
 /** The five slugs, as a union. Generated — never hand-edit. */
 export type DoctorSlug = DoctorRecord["slug"];
+
+// Mirrors `getTreatmentBySlug` above. There is deliberately no /doctors/[slug]
+// route, but /book?doctor=<slug> has to turn an untrusted query string into a
+// real record — reading `.slug` off the result is what narrows it back to the
+// literal union, so nothing needs to cast the raw param.
+export const getDoctorBySlug = (slug: string): DoctorRecord | undefined =>
+  doctors.find((d) => d.slug === slug);
 
 export const testimonials: Testimonial[] = [
   {

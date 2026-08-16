@@ -116,6 +116,11 @@ Two families, loaded via `next/font/google` in `app/layout.tsx` and exposed as
 layout. It sits above content but below the navbar (`z-50`). It is what stops
 the flat colours reading as digital.
 
+`StickyContact` (the fixed WhatsApp/phone rail, also root-layout-mounted) is
+`z-40` — under the grain by design, because it must stay under the mobile
+`Sheet` at `z-50`: it renders after `{children}`, so an equal z-index would win
+the tie and float over an open menu.
+
 ---
 
 ## Motion
@@ -211,6 +216,34 @@ hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant
 Cards over imagery add `bg-card/85`–`/90` with `backdrop-blur-sm`. Images
 inside cards scale on hover: `duration-700 ease-out group-hover:scale-105`,
 with the card as `group`.
+
+### Forms
+
+`components/consultation/` is the only place the site takes input. It finally
+uses `--input` and `--ring`, which were declared from the start and unused.
+
+- **Controls** are `components/ui/input.tsx` / `textarea.tsx`, re-scaled to
+  `h-11 rounded-lg border-input bg-card` with the same
+  `focus-visible:ring-2 ring-ring ring-offset-2` recipe as the button base.
+  `text-base` on mobile is deliberate — smaller makes iOS Safari zoom on focus.
+- **Dropdowns are native `<select>`** (`SelectField`), `appearance-none` with a
+  `pointer-events-none` lucide `ChevronDown` at `right-4`. Not shadcn's Select.
+  Both take a full row: the doctor labels are `Name — Specialty` and a
+  half-width control clips them when closed.
+- **Labels are the eyebrow**, one notch quieter than `SectionLabel`:
+  `text-[0.68rem] uppercase tracking-[0.2em] text-muted-foreground`. Required
+  fields carry a `text-destructive` asterisk marked `aria-hidden`; optional ones
+  say so in lowercase beside the label. Placeholders are examples, never labels.
+- **Error state** is `border-destructive focus-visible:ring-destructive` plus a
+  `text-xs text-destructive` line with an `AlertCircle`, wired through
+  `aria-describedby`. `FormField` owns all of it so it cannot drift.
+- **Choice pills** (`TimeOfDayField`) are `sr-only` radios inside a `fieldset`,
+  styled through `peer-checked:border-primary peer-checked:bg-primary/10` over
+  the card hover pattern, with `peer-focus-visible:ring-*` for the focus ring.
+- **Success is a panel, not a toast** — `role="status" aria-live="polite"` plus
+  `tabIndex={-1}` and a `.focus()`, inside `rounded-3xl border-primary/30
+  bg-card shadow-elegant`. A toast would disappear, and it is the only record
+  the visitor gets of what they sent.
 
 ### Icons
 

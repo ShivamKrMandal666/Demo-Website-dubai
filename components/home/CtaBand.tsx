@@ -1,5 +1,6 @@
-import { ArrowUpRight } from "lucide-react";
-import { ToastButton, BOOKING_TOAST } from "@/components/site/ToastButton";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { BookButton } from "@/components/site/BookButton";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { textures } from "@/lib/images";
@@ -34,25 +35,15 @@ export const CtaBand = () => (
         </Reveal>
         <Reveal delay={0.15}>
           <div className="mt-9 flex flex-wrap gap-4">
-            <ToastButton
-              title={BOOKING_TOAST.title}
-              description={BOOKING_TOAST.description}
-              variant="gold"
-              size="xl"
-              className="rounded-full"
-            >
-              Book an Appointment
-              <ArrowUpRight className="h-4 w-4" />
-            </ToastButton>
-            <ToastButton
-              title="We&rsquo;ll be in touch"
-              description="Leave your details and our team will call you back."
-              variant="outlineBone"
-              size="xl"
-              className="rounded-full"
-            >
-              Request a Callback
-            </ToastButton>
+            <BookButton variant="gold" size="xl" className="rounded-full" />
+            {/* The callback ask is the same request with less commitment, so it
+                goes to /contact rather than /book — same form, framed as an
+                enquiry. (It was a toast whose title read `We&rsquo;ll be in
+                touch` literally: an HTML entity inside a JS string is not
+                parsed as one.) */}
+            <Button asChild variant="outlineBone" size="xl" className="rounded-full">
+              <Link href="/contact">Request a Callback</Link>
+            </Button>
           </div>
         </Reveal>
       </div>

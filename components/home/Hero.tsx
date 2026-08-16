@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, Award, ArrowDown } from "lucide-react";
-import { toast } from "sonner";
+import { Award, ArrowDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { BookButton } from "@/components/site/BookButton";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { heroImages } from "@/lib/images";
 import { scrollToId } from "@/lib/smooth-scroll";
@@ -32,11 +32,6 @@ export const Hero = () => {
     const next = (active + 1) % heroImages.length;
     setWarm((w) => Math.max(w, active, next));
   }, [active]);
-
-  const handleBook = () =>
-    toast("Booking request received", {
-      description: "Our concierge will confirm your appointment shortly.",
-    });
 
   return (
     <section id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
@@ -107,10 +102,7 @@ export const Hero = () => {
             style={{ animationDelay: "360ms" }}
             className="animate-fade-up mt-9 flex flex-wrap items-center gap-4"
           >
-            <Button onClick={handleBook} variant="gold" size="xl" className="rounded-full">
-              Book an Appointment
-              <ArrowUpRight className="h-4 w-4" />
-            </Button>
+            <BookButton variant="gold" size="xl" className="rounded-full" />
             <Button onClick={() => scrollToId("#treatments")} variant="hero" size="xl" className="rounded-full">
               Explore Treatments
             </Button>
@@ -139,10 +131,12 @@ export const Hero = () => {
         </div>
       </div>
 
-      {/* 10% — Trust marker / award badge */}
+      {/* 10% — Trust marker / award badge. Shifted left of `right-5` /
+          `md:right-10` to clear the fixed StickyContact rail, which sits in
+          this same corner on every page. */}
       <div
         style={{ animationDelay: "500ms" }}
-        className="animate-fade-up absolute bottom-8 right-5 z-20 hidden sm:block md:bottom-12 md:right-10"
+        className="animate-fade-up absolute bottom-8 right-[4.5rem] z-20 hidden sm:block md:bottom-12 md:right-24"
       >
         <div className="flex items-center gap-4 rounded-2xl border border-bone/20 bg-espresso-deep/45 px-5 py-4 backdrop-blur-md">
           <Award className="h-9 w-9 shrink-0 text-gold" />

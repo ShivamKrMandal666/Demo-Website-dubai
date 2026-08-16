@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { ArrowUpRight, Menu } from "lucide-react";
-import { toast } from "sonner";
+import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { BookButton } from "@/components/site/BookButton";
 // The mobile menu panel is the only thing on the site that uses Radix Dialog,
 // and it is closed on first paint of every route, so it loads on demand and
 // @radix-ui/react-dialog stays out of the initial bundle. `ssr: false` is safe
@@ -81,11 +80,6 @@ export const Navbar = () => {
     setMenuOpen(true);
   };
 
-  const handleBook = () =>
-    toast("Booking request received", {
-      description: "Our concierge will confirm your appointment shortly.",
-    });
-
   return (
     <header
       className={cn(
@@ -138,15 +132,11 @@ export const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            onClick={handleBook}
+          <BookButton
             variant="gold"
             size="sm"
             className="hidden rounded-full sm:inline-flex"
-          >
-            Book an Appointment
-            <ArrowUpRight className="h-4 w-4" />
-          </Button>
+          />
 
           {/* Mobile menu trigger. Rendered here, not in MobileMenu, so it is
               present in the server-rendered HTML — see the import comment. */}

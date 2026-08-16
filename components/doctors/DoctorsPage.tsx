@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { ArrowUpRight, Check, Globe, GraduationCap, Stethoscope } from "lucide-react";
+import { Check, Globe, GraduationCap, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ToastButton, BOOKING_TOAST } from "@/components/site/ToastButton";
+import { BookButton } from "@/components/site/BookButton";
 import { ScrollButton } from "@/components/site/ScrollButton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -29,9 +29,9 @@ const process = [
   },
 ];
 
-// Rendered by app/doctors/page.tsx. A server component: the booking toasts and
-// the in-page scroll CTA are the only interactive parts and they live in the
-// ToastButton / ScrollButton client leaves, so none of this markup ships.
+// Rendered by app/doctors/page.tsx. A server component: the in-page scroll CTA
+// is the only interactive part and it lives in the ScrollButton client leaf, so
+// none of this markup ships. `BookButton` is a plain link, so it stays here too.
 export default function DoctorsPage() {
   const stats = [
     { value: String(clinic.established), label: "Established" },
@@ -79,15 +79,7 @@ export default function DoctorsPage() {
             </FadeUp>
             <FadeUp delay={240}>
               <div className="mt-8 flex flex-wrap gap-4">
-                <ToastButton
-                  title={BOOKING_TOAST.title}
-                  description={BOOKING_TOAST.description}
-                  variant="gold"
-                  size="xl"
-                  className="rounded-full"
-                >
-                  Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                </ToastButton>
+                <BookButton variant="gold" size="xl" className="rounded-full" />
                 <ScrollButton to="#team" variant="hero" size="xl" className="rounded-full">
                   Meet the doctors
                 </ScrollButton>
@@ -285,15 +277,15 @@ export default function DoctorsPage() {
                         ))}
                       </div>
 
-                      <ToastButton
-                        title={BOOKING_TOAST.title}
-                        description={`We'll confirm your consultation with ${doc.name} shortly.`}
+                      {/* Named CTA, but the same destination — /book opens
+                          with this doctor already selected. */}
+                      <BookButton
+                        doctor={doc.slug}
+                        label={`Consult with ${firstName}`}
                         variant="gold"
                         size="lg"
                         className="mt-8 rounded-full"
-                      >
-                        Consult with {firstName} <ArrowUpRight className="h-4 w-4" />
-                      </ToastButton>
+                      />
                     </Reveal>
                   </article>
                 );
@@ -364,15 +356,7 @@ export default function DoctorsPage() {
                 </p>
               </Reveal>
               <Reveal delay={0.15}>
-                <ToastButton
-                  title={BOOKING_TOAST.title}
-                  description={BOOKING_TOAST.description}
-                  variant="gold"
-                  size="xl"
-                  className="mt-8 rounded-full"
-                >
-                  Book an Appointment <ArrowUpRight className="h-4 w-4" />
-                </ToastButton>
+                <BookButton variant="gold" size="xl" className="mt-8 rounded-full" />
               </Reveal>
             </div>
           </div>
