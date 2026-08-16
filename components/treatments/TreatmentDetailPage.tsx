@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -16,6 +15,7 @@ import { Footer } from "@/components/site/Footer";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
 import { FadeUp } from "@/components/site/FadeUp";
+import { MediaImage } from "@/components/site/MediaImage";
 import { getTreatmentBySlug, treatments } from "@/lib/data/site";
 import { treatmentCardImage, treatmentHeroImage } from "@/lib/images";
 
@@ -42,14 +42,12 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
         {/* Hero — unique background per treatment */}
         <section id="top" className="relative flex h-[60vh] min-h-[440px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
-          <Image
+          <MediaImage
             src={treatmentHeroImage(t.slug)}
             alt=""
-            aria-hidden="true"
-            fill
             priority
             sizes="100vw"
-            className="object-cover bg-center animate-kenburns"
+            className="bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
@@ -86,13 +84,14 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
             <Reveal y={40}>
               <div className="relative mx-auto aspect-[16/10] max-w-3xl overflow-hidden rounded-3xl border border-border bg-card shadow-elegant">
                 {/* Not `priority` — the hero above is this route's declared LCP
-                    element, and a second preload only competes with it. */}
-                <Image
+                    element, and a second preload only competes with it. But
+                    `eager`: it overlaps the hero, so it is on screen from the
+                    first pixel of scroll. */}
+                <MediaImage
                   src={treatmentCardImage(t.slug)}
                   alt={t.name}
-                  fill
+                  eager
                   sizes="(min-width: 768px) 48rem, 100vw"
-                  className="object-cover"
                 />
               </div>
             </Reveal>
@@ -274,12 +273,11 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
-                      <Image
+                      <MediaImage
                         src={treatmentCardImage(o.slug)}
                         alt={o.name}
-                        fill
                         sizes="(min-width: 640px) 33vw, 100vw"
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        className="transition-transform duration-700 ease-out group-hover:scale-105"
                       />
                     </div>
                     <div className="flex flex-1 flex-col p-5">

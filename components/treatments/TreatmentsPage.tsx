@@ -7,6 +7,7 @@ import { MapSection } from "@/components/home/MapSection";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger } from "@/components/site/Reveal";
 import { FadeUp } from "@/components/site/FadeUp";
+import { MediaImage } from "@/components/site/MediaImage";
 import { TreatmentGridCard } from "@/components/treatments/TreatmentGridCard";
 import { treatments } from "@/lib/data/site";
 import { backgrounds, textures } from "@/lib/images";
@@ -23,14 +24,12 @@ export default function TreatmentsPage() {
         {/* Hero — single static background image */}
         <section id="top" className="relative flex h-[62vh] min-h-[460px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
-          <Image
+          <MediaImage
             src={backgrounds.treatmentsHero}
             alt=""
-            aria-hidden="true"
-            fill
             priority
             sizes="100vw"
-            className="object-cover bg-center animate-kenburns"
+            className="bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
@@ -90,8 +89,8 @@ export default function TreatmentsPage() {
               stagger={0.08}
               className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-16 md:grid-cols-6"
             >
-              {treatments.map((t) => (
-                <TreatmentGridCard key={t.slug} t={t} />
+              {treatments.map((t, i) => (
+                <TreatmentGridCard key={t.slug} t={t} index={i} />
               ))}
             </RevealStagger>
           </div>

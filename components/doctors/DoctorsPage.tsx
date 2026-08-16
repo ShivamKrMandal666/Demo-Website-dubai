@@ -9,6 +9,7 @@ import { MapSection } from "@/components/home/MapSection";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
 import { FadeUp } from "@/components/site/FadeUp";
+import { MediaImage } from "@/components/site/MediaImage";
 import { clinic, doctors } from "@/lib/data/site";
 import { backgrounds, textures, doctorPortrait } from "@/lib/images";
 
@@ -48,14 +49,12 @@ export default function DoctorsPage() {
             treatment as /treatments. */}
         <section id="top" className="relative flex h-[62vh] min-h-[460px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
-          <Image
+          <MediaImage
             src={backgrounds.hero2}
             alt=""
-            aria-hidden="true"
-            fill
             priority
             sizes="100vw"
-            className="object-cover bg-center animate-kenburns"
+            className="bg-center animate-kenburns"
           />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-0 bg-gradient-hero-bottom" />
@@ -176,13 +175,15 @@ export default function DoctorsPage() {
                         />
                         <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border bg-muted shadow-elegant">
                           {/* Not `priority` — the hero above is this route's
-                              declared LCP element. */}
-                          <Image
+                              declared LCP element. The first profile is
+                              `eager`: it sits immediately under the hero, so
+                              waiting for it to intersect is what produced the
+                              first-scroll pop. */}
+                          <MediaImage
                             src={doctorPortrait(doc.slug)}
                             alt={doc.name}
-                            fill
+                            eager={i === 0}
                             sizes="(min-width: 768px) 40vw, 100vw"
-                            className="object-cover"
                           />
                         </div>
                       </div>

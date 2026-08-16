@@ -7,12 +7,11 @@ once its outcome lands in Completed or Architecture Decisions.
 
 **Prototype.** Every page in the nav is built and live; all five `navLinks`
 entries point at real routes. Nothing in flight. Last verification (2026-08-16,
-after StickyContact): `typecheck`, `lint`, `build` clean; **19** static pages,
-none dynamic; shared First Load JS still 102 kB. Driven over CDP at 1440x900
-and 390x844 — icons `z-40` / 48px desktop / 44px mobile, absent from `/gallery`
-and back on return, behind the open mobile menu: all green. (Note: headless
-`--window-size` alone does **not** emulate a mobile viewport — it crops a
-desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
+after the loading system): `typecheck`, `lint`, `build` clean; **19** static
+pages, none dynamic; shared First Load JS 102 kB, per-route +1–2 kB against
+HEAD, `/gallery` unchanged at 175 kB. Driven over CDP at 1440x900 and 390x844.
+(Note: headless `--window-size` alone does **not** emulate a mobile viewport —
+it crops a desktop-width layout. Use `Emulation.setDeviceMetricsOverride`.)
 
 ## Completed
 
@@ -36,6 +35,16 @@ desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
   `/gallery` by `usePathname` on the widget side (the island may not import from
   `components/`). New `clinic.whatsapp` placeholder + `whatsappHref()`; the Hero
   award badge shifted left to clear the rail. Quick contact only — not booking.
+- **Clinic photo in About** — `public/images/about/clinic-exterior.png` (928x1152,
+  the 35th image), exported as `photos.clinicExterior`. Replaced the dashed
+  "Foreground image" placeholder; the 4:5 box, texture panel and "Est. 2009"
+  badge are unchanged.
+- **Loading system** — `MediaImage` (blur-up dissolve, 400px approach margin,
+  "Image unavailable" fallback) on all ~40 content photos; decorative textures
+  and the Hero slideshow stay plain server `<Image>`. `RouteProgress` (custom,
+  ~1 kB, `bg-gold`, `z-[60]`) + `lib/route-progress.ts`, since the nav pushes
+  routes from `<button>`s and clicks no anchor. `Skeleton` + `shimmer`.
+  `loading.tsx` on the five non-home routes. Form submit spinner.
 - **Design system** (tokens in `app/globals.css` + `tailwind.config.ts`), **34
   optimized images** (2.8 MB), **performance pass** (First Load JS 201 -> 165 kB).
 
@@ -61,7 +70,11 @@ desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
 - **Scroll smoothness is untouched, with measured cost** — `.grain-overlay`
   (fixed, full-viewport, `multiply`, `app/globals.css:145`) recomposites every
   frame and compounds with Lenis; `md:bg-fixed` and infinite `animate-kenburns`
-  do the same. *Scroll* costs, so they never hit LCP/TBT.
+  do the same. *Scroll* costs, so they never hit LCP/TBT. **Still the leading
+  hypothesis and still unverified**: rAF-sampled dropped-frame rates over CDP
+  vary 7–14% between runs of the *same* build, which is wider than any
+  before/after gap, so that harness cannot settle it. Needs a real DevTools
+  performance trace (compositor events), not frame sampling.
 - **LCP on `/` (~4.6 s) is a script-count problem** — the hero `<h1>` has 0 ms
   load delay and ~4.1 s render delay charged to a dozen critical scripts.
 - **`context/ui-context.md` is stale** where it calls the map/footer overlap
@@ -74,6 +87,14 @@ desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
   from its details list — only the sticky rail exposes it.
 - **`MapSection`'s "Get directions" button has no handler** (`components/home/
   MapSection.tsx:67`). Pre-existing, left alone in this change.
+- **The five `loading.tsx` shells never actually render.** Confirmed over CDP on
+  an 80 kbps link: a 2.3 s navigation held the old page on screen and went
+  straight to the finished route. `loading.tsx` only paints when a segment
+  *suspends*, and every route here is fully prerendered with no async work in
+  it, so React swaps in one shot. They are kept because they cost ~1 kB and go
+  live the moment any route gains async data — but the wait is currently
+  covered by `RouteProgress`, not by them. Delete them if that trade stops
+  looking worth it.
 
 ## Architecture Decisions
 
@@ -91,6 +112,10 @@ desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
   3 required, no async or cross-field rules and no server schema to share, so
   the library would have been ~27 kB against a tracked budget. Validation is a
   pure module (`lib/consultation.ts`) with no React in it, swappable later.
+  **It now has a pending state** (`SUBMIT_DELAY_MS = 600`) — the earlier "a
+  simulated delay would be theatre" call was reversed on instruction, because
+  without it the spinner exists but is never seen. Replace the timeout with the
+  real `await` and nothing else in the component changes.
   **The two dropdowns are native `<select>`s** — a deliberate exception to the
   shadcn-only rule in AGENTS.md, since shadcn's Select is an ~18–20 kB Radix
   listbox that replaces a better OS picker on mobile. **`/book` keeps its
@@ -134,7 +159,12 @@ desktop-width layout. Use `Emulation.setDeviceMetricsOverride` over CDP.)
   upscale sources (`deviceSizes` capped 1200); AVIF measured — same FCP/LCP,
   64 KB lighter. **One `priority` image per route, only where the LCP is an
   image** — the Hero's first slide is `eager` but not `priority` (the `<h1>` is
-  the LCP on `/`; the preload delayed the stylesheet 28 -> 96 ms).
+  the LCP on `/`; the preload delayed the stylesheet 28 -> 96 ms). That still
+  holds: the loading pass added an `eager` tier (`MediaImage`) for the
+  just-below-fold images rather than promoting anything to `priority`.
+  **`MediaImage` unmounts its blur layer after the 200 ms dissolve** — left at
+  `opacity: 0` it would keep ~40 blurred, scaled layers alive for the
+  compositor on every scrolled frame.
 - **Slug unions are generated from the data** — `as const satisfies readonly
   Treatment[]` / `Doctor[]` drives `TreatmentSlug`, `generateStaticParams` and the
   image `Record` checks, so a missing portrait fails `typecheck`; `slug` stays

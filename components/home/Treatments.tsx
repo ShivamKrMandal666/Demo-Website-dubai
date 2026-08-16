@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
+import { MediaImage } from "@/components/site/MediaImage";
 import { treatments, type TreatmentRecord } from "@/lib/data/site";
 import { treatmentCardImage, textures } from "@/lib/images";
 
@@ -26,10 +27,12 @@ const TreatmentCard = ({
   t,
   className,
   sizes,
+  eager,
 }: {
   t: TreatmentRecord;
   className?: string;
   sizes: string;
+  eager?: boolean;
 }) => (
   <RevealItem className={cn("h-full", className)}>
     <Link
@@ -37,12 +40,12 @@ const TreatmentCard = ({
       className="group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
     >
       <div className="relative flex-1 overflow-hidden">
-        <Image
+        <MediaImage
           src={treatmentCardImage(t.slug)}
           alt={t.name}
-          fill
+          eager={eager}
           sizes={sizes}
-          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="transition-transform duration-700 ease-out group-hover:scale-105"
         />
         <div
           className="absolute inset-0 bg-gradient-to-t from-espresso-deep/55 via-transparent to-transparent"
@@ -102,6 +105,9 @@ export const Treatments = () => (
             t={t}
             className={bento[i]?.className}
             sizes={bento[i]?.sizes ?? "(min-width: 768px) 33vw, 100vw"}
+            // The 2x2 feature card is the largest image in this section and the
+            // first one a visitor scrolls into from the hero.
+            eager={i === 0}
           />
         ))}
       </RevealStagger>

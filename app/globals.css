@@ -163,4 +163,11 @@ html.lenis, html.lenis body { height: auto; }
     opacity: 1;
     transform: none;
   }
+
+  /* The skeleton sweep is decorative — a still panel still communicates
+     "not here yet". Unlike .animate-fade-up there is nothing to pin: the
+     gradient renders fine at its start position. */
+  .animate-shimmer {
+    animation: none;
+  }
 }

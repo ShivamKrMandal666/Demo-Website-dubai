@@ -66,6 +66,13 @@ import bgTextureTestimonial from "@/public/images/backgrounds/texture-testimonia
 import bgTextureFooter from "@/public/images/backgrounds/texture-footer.jpg";
 import bgCtaBand from "@/public/images/backgrounds/cta-band.jpg";
 
+// -- content photography (not decorative) ------------------------------------
+// The clinic storefront, client-supplied. 928x1152 — a 4:5 crop by intent, and
+// already under the 1200 deviceSizes cap in next.config.ts, so no candidate
+// upscales it. PNG rather than JPEG because that is how it was supplied; the
+// optimizer serves AVIF/WebP from it either way.
+import aboutClinicExterior from "@/public/images/about/clinic-exterior.png";
+
 // Both maps are keyed by TreatmentSlug, so adding a treatment to lib/data/site.ts
 // without adding its two images — or misspelling either — fails
 // `npm run typecheck`.
@@ -134,6 +141,12 @@ export const heroImages: StaticImageData[] = [
   backgrounds.hero2,
   backgrounds.hero3,
 ];
+
+// Real photography, as opposed to the decorative `textures` below: this one
+// carries meaning and takes a real `alt`.
+export const photos = {
+  clinicExterior: aboutClinicExterior,
+} as const;
 
 export const textures = {
   about: backgrounds.textureAbout,

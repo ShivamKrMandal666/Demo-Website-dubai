@@ -98,6 +98,10 @@ const config: Config = {
         // `animation-delay`, and backwards fill is what holds them at the 0%
         // keyframe during that delay instead of flashing in and back out.
         "fade-up": "fade-up 0.8s cubic-bezier(0.22,1,0.36,1) both",
+        // Slow and steady, `linear`: a skeleton sweep that accelerates reads as
+        // activity rather than as waiting. The keyframe was already here,
+        // unused, from the original design pass.
+        shimmer: "shimmer 2.4s linear infinite",
         "pulse-ring": "pulse-ring 2.6s cubic-bezier(0.22,1,0.36,1) infinite",
         "scroll-cue": "scroll-cue 1.8s ease-in-out infinite",
       },

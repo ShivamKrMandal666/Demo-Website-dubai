@@ -3,6 +3,7 @@ import { Fraunces, Jost } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { RouteTransition } from "@/components/site/RouteTransition";
+import { RouteProgress } from "@/components/site/RouteProgress";
 import { MotionProvider } from "@/components/site/MotionProvider";
 import { StickyContact } from "@/components/site/StickyContact";
 import { clinic } from "@/lib/data/site";
@@ -45,6 +46,10 @@ export default function RootLayout({
       <body>
         <SmoothScroll />
         <RouteTransition />
+        {/* Sits at z-[60], above both the grain overlay (z-41) and the mobile
+            Sheet (z-50) — a navigation started from the open menu still shows
+            its progress. */}
+        <RouteProgress />
         <div className="grain-overlay" aria-hidden="true" />
         <MotionProvider>{children}</MotionProvider>
         {/* Outside MotionProvider — it uses no `motion` primitives, so the

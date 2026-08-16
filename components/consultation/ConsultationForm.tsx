@@ -1,7 +1,7 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { ArrowUpRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,7 @@ import {
   doctorOptions,
   emptyConsultation,
   RESPONSE_WINDOW_HOURS,
+  SUBMIT_DELAY_MS,
   treatmentOptions,
   type ConsultationValues,
 } from "@/lib/data/consultation";
@@ -62,6 +63,15 @@ export const ConsultationForm = ({
   const [errors, setErrors] = useState<ConsultationErrors>({});
   // Doubles as the status flag and the frozen snapshot the panel echoes back.
   const [submitted, setSubmitted] = useState<ConsultationValues | null>(null);
+  const [pending, setPending] = useState(false);
+  const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (pendingTimer.current) clearTimeout(pendingTimer.current);
+    },
+    [],
+  );
 
   const setField = <K extends keyof ConsultationValues>(
     field: K,
@@ -83,6 +93,8 @@ export const ConsultationForm = ({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (pending) return;
+
     const found = validateConsultation(values);
     const firstInvalid = FIELD_ORDER.find((field) => found[field]);
 
@@ -93,12 +105,19 @@ export const ConsultationForm = ({
       return;
     }
 
-    // No backend, so no pending state: the success panel *is* the optimistic
-    // response. A simulated delay here would be theatre.
-    setSubmitted(values);
+    // The success panel is still the optimistic response — there is no backend
+    // to wait for. SUBMIT_DELAY_MS only holds the pending state long enough to
+    // be seen; swap it for the real request and nothing else here changes.
+    setPending(true);
+    pendingTimer.current = setTimeout(() => {
+      setPending(false);
+      setSubmitted(values);
+    }, SUBMIT_DELAY_MS);
   };
 
   const reset = () => {
+    if (pendingTimer.current) clearTimeout(pendingTimer.current);
+    setPending(false);
     setValues({ ...emptyConsultation, ...prefill });
     setErrors({});
     setSubmitted(null);
@@ -119,6 +138,7 @@ export const ConsultationForm = ({
       // are the only error UI. `required` stays on each control regardless, so
       // assistive tech still announces the field as required.
       noValidate
+      aria-busy={pending || undefined}
       aria-describedby={`${uid}-note`}
       className={cn("space-y-6", className)}
     >
@@ -276,9 +296,27 @@ export const ConsultationForm = ({
         </FormField>
       </div>
 
-      <Button type="submit" variant="gold" size="xl" className="rounded-full">
-        {submitLabel}
-        <ArrowUpRight className="h-4 w-4" />
+      {/* `disabled` while pending is what prevents a double submit — the guard
+          in handleSubmit only covers the Enter key, which fires past a
+          pointer-events-none button. */}
+      <Button
+        type="submit"
+        variant="gold"
+        size="xl"
+        disabled={pending}
+        className="rounded-full"
+      >
+        {pending ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Sending…
+          </>
+        ) : (
+          <>
+            {submitLabel}
+            <ArrowUpRight className="h-4 w-4" />
+          </>
+        )}
       </Button>
     </form>
   );
