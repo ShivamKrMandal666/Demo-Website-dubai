@@ -98,16 +98,37 @@ Two families, loaded via `next/font/google` in `app/layout.tsx` and exposed as
 - Every section is wrapped in `container mx-auto` — centred, `1.25rem` padding
   (`2rem` at `lg`), capped at `1280px`.
 - **Section rhythm is `py-24 md:py-32`.** Sub-sections inside a page use
-  `py-16 md:py-24`.
+  `py-16 md:py-24`. Sections whose content is tall on a phone step down first —
+  the Home Doctors carousel is `py-16 sm:py-24 md:py-32`.
+- **Every fixed ratio, type scale and grid needs a mobile step.** The pattern
+  that broke this site on phones was a desktop value with no `sm:`/`md:` variant:
+  `aspect-[4/5]` portraits (437px tall at full mobile width), 3-up grids that
+  never collapsed, and `size="xl"` buttons against `whitespace-nowrap`.
+  Decorative offset frames (`-left-3`/`-right-3`) are `hidden ... lg:block`,
+  because the container gutter is only 20px until `lg`.
+- **A shorter box is not automatically a better box — check it against the
+  source ratio.** Doctor portraits are `aspect-square md:aspect-[4/5]` with
+  `object-top md:object-center`. The sources are 4:5, so the box matches exactly
+  from `md` and nothing is cropped; below `md` the square discards 20% of the
+  height and `object-top` spends all of it on the bottom of the frame. An earlier
+  `aspect-[4/3]` threw away 40% and, centred, opened mid-forehead on all five.
+  **Any box whose ratio differs from its source needs its `object-position`
+  chosen deliberately** — the gallery's one square source carries `50% 20%` for
+  the same reason.
+- **Viewport heights use `svh`, never `vh`** — `vh` resizes when the mobile URL
+  bar collapses. Any `min-h-[...]` beside one must be small enough not to defeat
+  it on a 375×667 screen.
 - Background imagery is applied as a `bg-cover bg-center` absolutely-positioned
   layer with a scrim over it, and content lifted with `relative z-10`. Sections
   that do this need `overflow-hidden`.
 - Grids lean asymmetric on purpose — `md:grid-cols-12` with offset column
-  starts, and a bento treatments grid mixing `md:col-span-2` / `md:row-span-2`.
-  Avoid uniform 3-up grids; the layout should never look flat.
-- Deliberate overlap is part of the language: the map section carries
-  `-mb-28 md:-mb-40` so it bleeds behind the footer, and the footer answers
-  with `pt-40 md:pt-56` and a gold hairline to define the seam.
+  starts, and a bento treatments grid mixing `lg:col-span-2` / `lg:row-span-2`.
+  Avoid uniform 3-up grids; the layout should never look flat. **The bento
+  starts at `lg`**: at 768px three columns are 229px wide and the card's own
+  text block eats most of the row, leaving the image a strip. Tablets get a
+  plain 2-up.
+- The map section and the footer are separate blocks, each with its own border
+  and shadow — there is no negative-margin bleed between them.
 
 ### Grain overlay
 
@@ -192,8 +213,11 @@ Beyond stock shadcn, the project adds brand variants. Choose by surface:
 | Dark section / over imagery | `gold` | `hero` or `outlineBone` |
 
 Other variants: `default` (sage fill), `espresso`, `outlineGold`, `linkGold`.
-Sizes add `xl` (`h-14 px-10`) for hero CTAs; `lg` for section CTAs; `sm` in the
-navbar and footer. **CTAs are always `rounded-full`.**
+Sizes add `xl` for hero CTAs; `lg` for section CTAs; `sm` in the navbar and
+footer. **CTAs are always `rounded-full`.** `xl` is itself stepped
+(`h-12 px-6 text-xs sm:h-14 sm:px-10 sm:text-sm`) — the base is
+`whitespace-nowrap`, and two unstepped `xl` buttons in a `flex-wrap` row
+overflowed a 320px viewport.
 
 Every variant lifts on hover (`hover:-translate-y-0.5`) over a `300ms`
 transition. Buttons pair with a trailing `ArrowUpRight` icon for booking
@@ -204,6 +228,26 @@ actions, `ArrowRight` for navigation.
 The eyebrow that opens every section: an `h-px w-8` rule plus a tracked
 uppercase label. `onDark` switches rule and text from sage to gold; `align`
 centres it. Every section starts with one.
+
+### `Stars`
+
+Whole-star rating, `components/site/Stars.tsx`. Filled is `fill-gold text-gold`,
+empty `text-muted-foreground/40`, and the group carries `role="img"` with an
+"N out of 5 stars" label — five decorative glyphs told a screen reader nothing.
+Shared by the Google rating block and the reviews carousel.
+
+### Carousels
+
+One pattern, used by the Home Doctors section and the reviews carousel:
+`DURATION = 5500`, the house `EASE`, an `[index, direction]` tuple, and
+`AnimatePresence mode="wait"` on the swapping pane. Manual steps re-create the
+interval so a click buys a full beat. The reviews carousel adds what Doctors
+lacks — pause on hover/focus, `aria-live`, `aria-current` dots with 44px tap
+targets, and no auto-rotation under `prefers-reduced-motion`.
+
+**Counts-per-view are CSS, not JS.** The reviews carousel always renders three
+slots and hides two below `md`; there is no `useMediaQuery` in this codebase,
+and a `matchMedia`-in-state version would disagree with the prerendered HTML.
 
 ### Card pattern
 

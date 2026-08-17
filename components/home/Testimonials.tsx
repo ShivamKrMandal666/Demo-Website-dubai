@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { Star, ExternalLink, Quote } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ExternalLink } from "lucide-react";
 import { ToastButton } from "@/components/site/ToastButton";
 import { SectionLabel } from "@/components/site/SectionLabel";
-import { Reveal, RevealStagger, RevealItem } from "@/components/site/Reveal";
-import { testimonials, googleRating } from "@/lib/data/site";
+import { Stars } from "@/components/site/Stars";
+import { Reveal } from "@/components/site/Reveal";
+import { ReviewsCarousel } from "@/components/home/ReviewsCarousel";
+import { googleRating } from "@/lib/data/site";
 import { textures } from "@/lib/images";
 
 const GoogleG = ({ className }: { className?: string }) => (
@@ -16,14 +17,9 @@ const GoogleG = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const Stars = ({ value = 5, className }: { value?: number; className?: string }) => (
-  <div className={cn("flex items-center gap-0.5", className)}>
-    {Array.from({ length: 5 }).map((_, i) => (
-      <Star key={i} className={cn("h-4 w-4", i < value ? "fill-gold text-gold" : "text-muted-foreground/40")} />
-    ))}
-  </div>
-);
-
+// The section stays a server component: the backdrop, the heading and the Google
+// rating block are static, and only the rotating cards need a client. Stars moved
+// to components/site so the carousel could share it.
 export const Testimonials = () => (
   <section id="testimonials" className="relative overflow-hidden py-24 md:py-32">
     {/* travertine background behind an inset content block */}
@@ -51,10 +47,15 @@ export const Testimonials = () => (
               <div>
                 <div className="flex items-center gap-3">
                   <span className="font-serif text-4xl leading-none text-foreground">{googleRating.score}</span>
+                  {/* The aggregate is 4.9 and these are whole stars, so the
+                      numeral beside them carries the precision. */}
                   <Stars value={5} />
                 </div>
+                {/* toLocaleString stays on the server side of the split — inside
+                    the client carousel it would format against the visitor's
+                    locale and mismatch the prerendered HTML. */}
                 <p className="mt-1 font-sans text-sm text-muted-foreground">
-                  Based on {googleRating.reviews.toLocaleString()} Google reviews
+                  Based on {googleRating.reviews.toLocaleString("en-GB")} Google reviews
                 </p>
               </div>
             </div>
@@ -71,24 +72,11 @@ export const Testimonials = () => (
           </div>
         </Reveal>
 
-        {/* Testimonial cards */}
-        <RevealStagger stagger={0.12} className="mt-8 grid gap-5 md:grid-cols-3">
-          {testimonials.map((t) => (
-            <RevealItem key={t.name} className="h-full">
-              <figure className="flex h-full flex-col rounded-2xl border border-border bg-card/90 p-7 shadow-soft backdrop-blur-sm transition-[transform,box-shadow] duration-500 hover:-translate-y-1.5 hover:shadow-elegant">
-                <Quote className="h-7 w-7 text-gold" />
-                <blockquote className="mt-4 font-serif text-lg leading-relaxed text-foreground/90">
-                  “{t.quote}”
-                </blockquote>
-                <figcaption className="mt-auto pt-6">
-                  <Stars value={5} className="mb-3" />
-                  <p className="font-sans text-sm font-medium text-foreground">{t.name}</p>
-                  <p className="font-sans text-xs uppercase tracking-[0.16em] text-muted-foreground">{t.treatment}</p>
-                </figcaption>
-              </figure>
-            </RevealItem>
-          ))}
-        </RevealStagger>
+        {/* The reviews themselves — one at a time on mobile, three on desktop,
+            rotating on the same 5.5s beat as the Doctors carousel. */}
+        <Reveal delay={0.15}>
+          <ReviewsCarousel />
+        </Reveal>
       </div>
     </div>
   </section>

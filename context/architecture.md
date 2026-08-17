@@ -32,19 +32,26 @@ Post-approval additions (not part of the current prototype stack): Supabase (bac
 
 1. No backend calls, database, or persistent storage in the prototype phase
 2. Dummy data lives in code (`lib/data`), never fetched from an external source
-3. Navbar, Footer, and Google Map components are shared and reused identically across all pages, not duplicated — **except `/gallery`**, see below
+3. Navbar, Footer, and Google Map components are shared and reused identically across all pages, not duplicated — **except `/gallery`**, which renders none of them; see below
 4. All images are compressed/optimized and organized under `public/images/`
 
 ## The `/gallery` exception
 
-`/gallery` is specified as a design island: a full-screen infinite drag grid of
-every site image, with none of the shared layout (no Navbar, Footer, Map or
-hero) and none of the design tokens, reachable only via the nav and left via a
-single fixed "Back to site" link. It is the one intentional departure from
-invariant 3 and from the "no hardcoded hex" rule in `code-standards.md`.
+**Scope of the exception changed in the final-changes pass.** It used to be a
+full design island — its own palette in literal hex, its own class merger, no
+token anywhere. That is reversed: the client asked for the gallery to feel
+visually consistent with the rest of the site, so tiles, chrome and surface now
+use the same tokens as every other route (`espresso-deep`, `bone`, `gold`,
+`rounded-2xl`, `shadow-elegant`) and the route imports `cn` from `lib/utils`
+like anything else. The route-local `cx.ts` is gone.
 
-The boundary runs both ways and is the point of the thing: `app/gallery/` may
-not import from `components/` or `lib/utils`, and nothing built for it may be
-promoted into either. Its only outward dependencies are `lib/images.ts` and
-`lib/data/site.ts` — content, not design. Everything else, including its own
-class merger and its CSS module, is local to the route.
+What remains exceptional is **layout, not styling**: `/gallery` renders none of
+the shared chrome (no Navbar, Footer, Map or hero) because it is a full-bleed
+`fixed inset-0` surface rather than a page, and it is left via a single fixed
+"Back to site" link. That is still a departure from invariant 3.
+
+Its mechanics stay route-local for the ordinary reason — no second consumer.
+`InfiniteDragScroll.tsx`, the CSS module and `use-viewport-lock.ts` live under
+`app/gallery/` because nothing else on the site drags a surface, not because a
+boundary forbids sharing. If a second consumer appears, promoting them is a
+normal refactor now.

@@ -4,20 +4,43 @@
 // The gallery's isolation shell.
 //
 // Every other route on this site renders <Navbar/> ... <MapSection/> <Footer/>
-// inside the shared design system. This one renders none of it, on purpose —
-// it is meant to read as a different product. That takes more than just not
-// importing the components, because the root layout wraps every route in
-// globals that would otherwise leak in. Each is dealt with below.
+// inside the shared design system. This one renders none of it — it is a
+// full-bleed surface, not a page. That still takes work, because the root
+// layout wraps every route in globals that would otherwise leak in, and each is
+// dealt with below.
+//
+// What it no longer does is style itself from scratch. The route used to hold
+// its own palette in literal hex; it now paints in the same tokens as the rest
+// of the site (espresso-deep, bone, gold), so the wall reads as this clinic's
+// gallery rather than a different product.
 // ---------------------------------------------------------------------------
+import { useCallback, useRef, useState } from "react";
 import { LazyMotion, domMax } from "motion/react";
 import { DraggableContainer, GridBody } from "./InfiniteDragScroll";
 import { GalleryTile } from "./GalleryTile";
 import { BackToSite } from "./BackToSite";
+import { Lightbox } from "./Lightbox";
 import { useViewportLock } from "./use-viewport-lock";
-import { galleryImages } from "../_data/gallery-images";
+import { galleryImages, type GalleryImage } from "../_data/gallery-images";
 
 export function GalleryExperience() {
   useViewportLock();
+
+  const [enlarged, setEnlarged] = useState<GalleryImage | null>(null);
+
+  // Mirrored into a ref because the wheel handler inside DraggableContainer is
+  // registered once and never re-reads component state.
+  const enlargedRef = useRef(false);
+
+  const open = useCallback((image: GalleryImage) => {
+    enlargedRef.current = true;
+    setEnlarged(image);
+  }, []);
+
+  const close = useCallback(() => {
+    enlargedRef.current = false;
+    setEnlarged(null);
+  }, []);
 
   return (
     <div
@@ -35,15 +58,12 @@ export function GalleryExperience() {
       //  - it covers body { bg-background }, so no warm bone shows through.
       // select-none suppresses the site's gold ::selection and stops text
       // selection fighting the drag; overscroll-none kills iOS rubber-band.
-      className="fixed inset-0 z-50 select-none overflow-hidden overscroll-none bg-[#0b0b0c]"
-      // Inline, because `color` and `font-family` are inherited from the body
-      // base rules in globals.css and both resolve to design tokens. Setting
-      // them here overrides the inheritance with literal values — a mono stack
-      // reads as a different design system on sight, which is the point.
-      style={{
-        color: "#e9e6e0",
-        fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-      }}
+      //
+      // `bg-espresso-deep` and `text-bone` are the site's darkest surface pair —
+      // the same one the Doctors section and the footer sit on. The font stack
+      // is simply inherited from body now; the route used to override it with a
+      // literal mono stack to look like a different system.
+      className="fixed inset-0 z-50 select-none overflow-hidden overscroll-none bg-espresso-deep text-bone"
     >
       {/*
         The root layout's provider is LazyMotion(domAnimation, strict), and
@@ -63,13 +83,18 @@ export function GalleryExperience() {
         what pulls the whole feature bundle in statically.
       */}
       <LazyMotion features={domMax}>
-        <DraggableContainer variant="masonry">
+        <DraggableContainer variant="masonry" pausedRef={enlargedRef}>
           <GridBody>
             {galleryImages.map((image, index) => (
-              <GalleryTile key={image.id} image={image} index={index} />
+              <GalleryTile key={image.id} image={image} index={index} onOpen={open} />
             ))}
           </GridBody>
         </DraggableContainer>
+
+        {/* Inside the domMax provider, which is already loaded for this route —
+            AnimatePresence would work under domAnimation alone, but there is
+            nothing to gain from rendering it outside. */}
+        <Lightbox image={enlarged} onClose={close} />
       </LazyMotion>
 
       <BackToSite />

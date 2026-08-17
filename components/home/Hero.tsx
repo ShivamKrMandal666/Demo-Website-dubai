@@ -33,8 +33,11 @@ export const Hero = () => {
     setWarm((w) => Math.max(w, active, next));
   }, [active]);
 
+  // The old 640px floor defeated the `svh` beside it: on a 375x667 phone the
+  // usable viewport is ~553px, so the hero was forced 87px taller than the
+  // screen and the slide indicators fell below the fold.
   return (
-    <section id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
+    <section id="top" className="relative h-[100svh] min-h-[520px] w-full overflow-hidden sm:min-h-[640px]">
       {/* 60% — Background slideshow (crossfade + slow ken burns) */}
       <div className="absolute inset-0">
         {heroImages.map((src, i) => (

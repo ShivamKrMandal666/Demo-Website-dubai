@@ -47,7 +47,7 @@ export default function DoctorsPage() {
       <main>
         {/* Hero — reuses an existing optimized background, same ken-burns
             treatment as /treatments. */}
-        <section id="top" className="relative flex h-[62vh] min-h-[460px] items-center overflow-hidden">
+        <section id="top" className="relative flex h-[62svh] min-h-[460px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={backgrounds.hero2}
@@ -127,8 +127,10 @@ export default function DoctorsPage() {
               {stats.map((s) => (
                 <RevealItem key={s.label} className="h-full">
                   <div className="h-full rounded-2xl border border-border bg-card p-6 shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1 hover:border-gold/50 hover:shadow-elegant">
-                    <p className="font-serif text-4xl text-foreground">{s.value}</p>
-                    <p className="mt-2 font-sans text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground">
+                    <p className="font-serif text-3xl text-foreground sm:text-4xl">{s.value}</p>
+                    {/* 0.22em tracking pushed "Years, lead clinician" past the
+                        117px of content width a 2-up card has on a 350px screen. */}
+                    <p className="mt-2 font-sans text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground sm:tracking-[0.22em]">
                       {s.label}
                     </p>
                   </div>
@@ -168,12 +170,23 @@ export default function DoctorsPage() {
                       <div className="relative">
                         <div
                           className={cn(
-                            "pointer-events-none absolute -top-3 hidden h-full w-full rounded-3xl border border-gold/30 sm:block",
+                            // lg, not sm: the container keeps a 20px gutter
+                            // until lg, so a -12px offset frame sat 8px from the
+                            // viewport edge on tablets. At lg the gutter is 32px
+                            // and the flourish has room to read as one.
+                            "pointer-events-none absolute -top-3 hidden h-full w-full rounded-3xl border border-gold/30 lg:block",
                             flipped ? "-right-3" : "-left-3",
                           )}
                           aria-hidden="true"
                         />
-                        <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-border bg-muted shadow-elegant">
+                        {/* Square below md — at 4:5 each portrait is 437px tall
+                            at full mobile width, and five profiles plus their
+                            details ran the section past 7,000px on a phone.
+                            Square, not 4:3: the sources are 4:5, so 4:3 threw
+                            away 40% of the height and cropped into the faces.
+                            See the note in components/home/Doctors.tsx.
+                            PageShellSkeleton mirrors this box; change both. */}
+                        <div className="relative aspect-square overflow-hidden rounded-3xl border border-border bg-muted shadow-elegant md:aspect-[4/5]">
                           {/* Not `priority` — the hero above is this route's
                               declared LCP element. The first profile is
                               `eager`: it sits immediately under the hero, so
@@ -184,6 +197,7 @@ export default function DoctorsPage() {
                             alt={doc.name}
                             eager={i === 0}
                             sizes="(min-width: 768px) 40vw, 100vw"
+                            className="object-top md:object-center"
                           />
                         </div>
                       </div>
@@ -298,7 +312,7 @@ export default function DoctorsPage() {
         {/* How we work */}
         <section className="relative overflow-hidden bg-secondary py-20 md:py-28">
           <div
-            className="pointer-events-none absolute -left-1/4 bottom-0 h-[600px] w-[600px] rounded-full opacity-40 blur-3xl"
+            className="pointer-events-none absolute -left-1/4 bottom-0 h-[320px] w-[320px] rounded-full opacity-40 blur-3xl md:h-[600px] md:w-[600px]"
             style={{ background: "radial-gradient(circle, hsl(var(--gold) / 0.3), transparent 65%)" }}
             aria-hidden="true"
           />

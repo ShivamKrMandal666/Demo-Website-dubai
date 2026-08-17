@@ -15,12 +15,23 @@ const homeTreatments = treatments.filter((t) => t.home);
 // Bento placement, index-aligned with `homeTreatments`. The first card is the
 // feature (2×2); the last spans two columns. `sizes` follows the span so the
 // browser never downloads a 66vw image for a 33vw slot.
+//
+// The bento starts at `lg`, not `md`. At exactly 768px three columns are 229px
+// wide, and the card's own text block needs ~154px of the 220px row — which left
+// the image a 66px strip. Tablets get a plain 2-up instead, and the spans only
+// engage once the columns are wide enough to carry them.
 const bento: { className?: string; sizes: string }[] = [
-  { className: "md:col-span-2 md:row-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
-  { sizes: "(min-width: 768px) 33vw, 100vw" },
-  { sizes: "(min-width: 768px) 33vw, 100vw" },
-  { sizes: "(min-width: 768px) 33vw, 100vw" },
-  { className: "md:col-span-2", sizes: "(min-width: 768px) 66vw, 100vw" },
+  {
+    className: "lg:col-span-2 lg:row-span-2",
+    sizes: "(min-width: 1024px) 66vw, (min-width: 640px) 50vw, 100vw",
+  },
+  { sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" },
+  { sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" },
+  { sizes: "(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" },
+  {
+    className: "lg:col-span-2",
+    sizes: "(min-width: 1024px) 66vw, (min-width: 640px) 50vw, 100vw",
+  },
 ];
 
 const TreatmentCard = ({
@@ -39,7 +50,11 @@ const TreatmentCard = ({
       href={`/treatments/${t.slug}`}
       className="group relative flex h-full min-h-[260px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
     >
-      <div className="relative flex-1 overflow-hidden">
+      {/* An explicit aspect below lg, like TreatmentGridCard: without the bento's
+          auto-rows the card only has its min-h-[260px] floor, and the ~130px text
+          block left the image a 2.7:1 letterbox. From lg the rows drive the
+          height, so flex-1 takes back over — same breakpoint the spans start at. */}
+      <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto lg:flex-1">
         <MediaImage
           src={treatmentCardImage(t.slug)}
           alt={t.name}
@@ -97,7 +112,7 @@ export const Treatments = () => (
       {/* Varied bento grid — one feature card + smaller supporting cards */}
       <RevealStagger
         stagger={0.1}
-        className="mt-12 grid grid-cols-1 gap-5 md:mt-16 md:grid-cols-3 md:auto-rows-[minmax(0,220px)]"
+        className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 md:mt-16 lg:grid-cols-3 lg:auto-rows-[minmax(0,240px)]"
       >
         {homeTreatments.map((t, i) => (
           <TreatmentCard

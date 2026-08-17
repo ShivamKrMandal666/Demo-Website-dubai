@@ -37,8 +37,10 @@ npm run lint
   every path through it, and never inline one in a component.
 - Components come from shadcn/ui (`npx shadcn add <name>`) or Vengeance UI
   (`npx shadcn add @vengeanceui/<name>`).
-- **`app/gallery/` is a deliberate exception to all of the above styling
-  rules** — it is specified as an island with its own design language. It uses
-  no shared component and no design token, and nothing in it may be promoted
-  into `components/` or `app/globals.css`. Read `app/gallery/_components/cx.ts`
-  before changing anything under that route.
+- **`app/gallery/` follows the same styling rules as everything else.** It was
+  a design island with its own literal palette; that was reversed on request, so
+  it now uses the site's tokens and `cn` from `lib/utils`. What is still special
+  is its *layout* — a full-bleed `fixed inset-0` surface with no shared chrome,
+  which means it escapes four root-layout globals on purpose. Read the comments
+  in `GalleryExperience.tsx` and `use-viewport-lock.ts` before changing anything
+  under that route.

@@ -39,10 +39,12 @@ export const Doctors = () => {
   const doc = doctors[active];
 
   return (
-    <section id="doctors" className="relative overflow-hidden bg-secondary py-24 md:py-32">
-      {/* warm radial glow for depth */}
+    <section id="doctors" className="relative overflow-hidden bg-secondary py-16 sm:py-24 md:py-32">
+      {/* warm radial glow for depth. Sized down on mobile: a 600px blur-3xl layer
+          is a real compositing cost on a phone for decoration that is mostly
+          off-screen there anyway. */}
       <div
-        className="pointer-events-none absolute -right-1/4 top-0 h-[600px] w-[600px] rounded-full opacity-40 blur-3xl"
+        className="pointer-events-none absolute -right-1/4 top-0 h-[320px] w-[320px] rounded-full opacity-40 blur-3xl md:h-[600px] md:w-[600px]"
         style={{ background: "radial-gradient(circle, hsl(var(--gold) / 0.35), transparent 65%)" }}
         aria-hidden="true"
       />
@@ -54,11 +56,23 @@ export const Doctors = () => {
           </h2>
         </Reveal>
 
-        <div className="mt-12 grid items-center gap-10 md:mt-16 md:grid-cols-2 md:gap-16">
+        <div className="mt-10 grid items-center gap-8 sm:mt-12 sm:gap-10 md:mt-16 md:grid-cols-2 md:gap-16">
           {/* Portrait (rotates) */}
           <div className="relative">
-            <div className="pointer-events-none absolute -left-3 -top-3 h-full w-full rounded-2xl border border-gold/25" aria-hidden="true" />
-            <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-bone/15 bg-espresso-deep/60">
+            {/* Hidden below lg: the container gutter is 20px until then, so a
+                -12px offset frame sits 8px off the viewport edge. Same guard,
+                same breakpoint, as the profiles on /doctors. */}
+            <div className="pointer-events-none absolute -left-3 -top-3 hidden h-full w-full rounded-2xl border border-gold/25 lg:block" aria-hidden="true" />
+            {/* 4:5 is 437px tall at full mobile width — over half a phone screen
+                for the portrait alone. Square below md, where the grid stops
+                giving this the full container width.
+                    The box has to stay in proportion to the source, not just be
+                short: the portraits are 4:5, so a 4:3 box discarded 40% of their
+                height and a centred crop opened mid-forehead. Square discards
+                20%, and `object-top` spends all of it on the bottom of the frame
+                — legs and furniture — so every head keeps its headroom. From md
+                the box matches the source exactly and nothing is cropped. */}
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-bone/15 bg-espresso-deep/60 md:aspect-[4/5]">
               {/* All five portraits are in the DOM at once, crossfading on
                   opacity — the same approach the Hero slideshow uses. Inside
                   AnimatePresence only the active slide would be mounted, so
@@ -87,6 +101,7 @@ export const Doctors = () => {
                     src={doctorPortrait(d.slug)}
                     alt=""
                     sizes="(min-width: 768px) 45vw, 100vw"
+                    className="object-top md:object-center"
                   />
                 </div>
               ))}
@@ -99,10 +114,15 @@ export const Doctors = () => {
           </div>
 
           {/* Details */}
-          <div className="min-h-[300px]">
+          <div>
             <AnimatePresence mode="wait" custom={dir}>
+              {/* The floor belongs on the swapping pane, not on the wrapper: the
+                  wrapper also holds the controls, timer and CTA, so its height
+                  never dipped near a 300px floor at any breakpoint and the
+                  carousel still jolted between doctors of different bio length. */}
               <m.div
                 key={doc.name}
+                className="min-h-[260px] sm:min-h-[280px]"
                 custom={dir}
                 variants={slide}
                 initial="enter"
@@ -127,7 +147,7 @@ export const Doctors = () => {
             </AnimatePresence>
 
             {/* Controls + progress */}
-            <div className="mt-10 flex items-center gap-6">
+            <div className="mt-8 flex items-center gap-6 md:mt-10">
               <div className="flex gap-2">
                 <button
                   aria-label="Previous doctor"
@@ -172,7 +192,7 @@ export const Doctors = () => {
               />
             </div>
 
-            <Button asChild variant="outlineBone" size="sm" className="mt-8 rounded-full">
+            <Button asChild variant="outlineBone" size="sm" className="mt-6 rounded-full md:mt-8">
               <Link href="/doctors">
                 Meet the team
                 <ArrowRight className="h-3.5 w-3.5" />

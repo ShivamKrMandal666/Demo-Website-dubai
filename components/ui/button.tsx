@@ -26,7 +26,11 @@ const buttonVariants = cva(
         default: "h-10 px-5 py-2",
         sm: "h-9 rounded-md px-4 text-xs",
         lg: "h-12 rounded-md px-8 text-[0.9rem]",
-        xl: "h-14 rounded-md px-10 text-sm",
+        // Stepped, because the base is `whitespace-nowrap`: two xl buttons in a
+        // flex-wrap row ("Book a Consultation" + "Request a Callback") overflow
+        // the content box on a 320px viewport at px-10/text-sm. Seven call sites
+        // pair them that way, so the fix belongs here rather than at each one.
+        xl: "h-12 rounded-md px-6 text-xs sm:h-14 sm:px-10 sm:text-sm",
         icon: "h-10 w-10",
       },
     },

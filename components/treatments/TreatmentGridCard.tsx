@@ -13,10 +13,14 @@ const spanClass: Record<TreatmentSpan, string> = {
   3: "md:col-span-3",
   4: "md:col-span-4",
 };
+// Gated to `md`, because `span` only means anything there. Applied at every
+// width it made a stacked mobile column alternate between full-width squares and
+// 16:10 letterboxes for no reason the reader can see — the variety is a function
+// of the 6-col grid, so it starts when the grid does.
 const aspectClass: Record<TreatmentSpan, string> = {
-  2: "aspect-square",
-  3: "aspect-[4/3]",
-  4: "aspect-[16/10]",
+  2: "md:aspect-square",
+  3: "md:aspect-[4/3]",
+  4: "md:aspect-[16/10]",
 };
 // Column share of the 6-col md grid, so the browser picks the right source.
 const sizesClass: Record<TreatmentSpan, string> = {
@@ -35,7 +39,7 @@ export const TreatmentGridCard = ({ t, index }: { t: TreatmentRecord; index: num
       href={`/treatments/${t.slug}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft transition-[transform,box-shadow,border-color] duration-500 hover:-translate-y-1.5 hover:border-gold/50 hover:shadow-elegant"
     >
-      <div className={cn("relative overflow-hidden", aspectClass[t.span] || "aspect-square")}>
+      <div className={cn("relative aspect-[4/3] overflow-hidden", aspectClass[t.span] || "md:aspect-square")}>
         <MediaImage
           src={treatmentCardImage(t.slug)}
           alt={t.name}

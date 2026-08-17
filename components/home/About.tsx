@@ -47,10 +47,12 @@ export const About = () => (
               />
             </div>
             {/* floating accent stat */}
-            <div className="absolute -bottom-6 -right-4 rounded-xl bg-secondary px-6 py-4 shadow-elegant md:-right-6">
+            {/* Pulled inside the gutter below sm — at -right-4 against a 20px
+                container padding it sat 4px from the viewport edge. */}
+            <div className="absolute -bottom-6 right-4 rounded-xl bg-secondary px-5 py-4 shadow-elegant sm:-right-4 sm:px-6 md:-right-6">
               <p className="font-serif text-3xl text-gold">Est. 2009</p>
               <p className="font-sans text-[0.62rem] uppercase tracking-[0.24em] text-bone/70">
-                Mayfair, London
+                Mayfair, Dubai
               </p>
             </div>
           </div>
@@ -80,10 +82,12 @@ export const About = () => (
           </Reveal>
 
           <Reveal delay={0.15}>
-            <div className="mt-9 grid grid-cols-3 gap-4 border-y border-border py-6">
+            {/* Stays 3-up — the type steps down instead. At 105px per column the
+                text-3xl figures plus text-xs labels wrapped to three lines. */}
+            <div className="mt-9 grid grid-cols-3 gap-3 border-y border-border py-6 sm:gap-4">
               {stats.map((s) => (
                 <div key={s.label}>
-                  <p className="font-serif text-3xl text-primary sm:text-4xl">{s.value}</p>
+                  <p className="font-serif text-2xl text-primary sm:text-3xl md:text-4xl">{s.value}</p>
                   <p className="mt-1 font-sans text-xs leading-snug text-muted-foreground">{s.label}</p>
                 </div>
               ))}
