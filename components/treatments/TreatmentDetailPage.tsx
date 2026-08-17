@@ -40,7 +40,7 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
       <Navbar />
       <main>
         {/* Hero — unique background per treatment */}
-        <section id="top" className="relative flex h-[60vh] min-h-[440px] items-center overflow-hidden">
+        <section id="top" className="relative flex h-[60svh] min-h-[440px] items-center overflow-hidden">
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={treatmentHeroImage(t.slug)}
@@ -265,7 +265,9 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                 <Link href="/treatments">View all</Link>
               </Button>
             </Reveal>
-            <RevealStagger stagger={0.1} className="grid gap-6 sm:grid-cols-3">
+            {/* 2-up at sm, 3-up at lg: jumping straight to three at 640px gave
+                each card ~187px for a 4:3 image and a text-lg serif name. */}
+            <RevealStagger stagger={0.1} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {others.map((o) => (
                 <RevealItem key={o.slug} className="h-full">
                   <Link
@@ -276,7 +278,7 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
                       <MediaImage
                         src={treatmentCardImage(o.slug)}
                         alt={o.name}
-                        sizes="(min-width: 640px) 33vw, 100vw"
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                         className="transition-transform duration-700 ease-out group-hover:scale-105"
                       />
                     </div>

@@ -7,8 +7,11 @@ import { clinic } from "@/lib/data/site";
 // A self-contained section that ends cleanly above the footer — the two are
 // deliberately separate blocks, each with its own border and shadow.
 export const MapSection = () => (
-  <section id="location" className="relative bg-background px-5 py-20 md:px-8 md:py-28 lg:px-16">
-    <div className="mx-auto max-w-7xl">
+  <section id="location" className="relative bg-background py-20 md:py-28">
+    {/* On `.container` like every other section. It used to carry its own
+        px-5/md:px-8/lg:px-16, so its edges missed the navbar, the footer and
+        every sibling section from md up. */}
+    <div className="container mx-auto">
       <div className="mb-10 max-w-xl md:mb-12">
         <Reveal>
           <SectionLabel>Find Us</SectionLabel>
@@ -21,7 +24,7 @@ export const MapSection = () => (
       </div>
 
       <Reveal y={40}>
-        <div className="relative h-[440px] overflow-hidden rounded-3xl border border-border bg-card shadow-elegant md:h-[560px]">
+        <div className="relative h-[300px] overflow-hidden rounded-3xl border border-border bg-card shadow-elegant sm:h-[440px] md:h-[560px]">
           {/* faux map surface */}
           <div className="absolute inset-0 bg-muted" />
           <div
@@ -54,14 +57,16 @@ export const MapSection = () => (
           </div>
 
           {/* placeholder chip */}
-          <div className="absolute left-5 top-5 rounded-full border border-border bg-background/85 px-4 py-2 backdrop-blur-sm">
-            <span className="font-sans text-[0.66rem] uppercase tracking-[0.22em] text-muted-foreground">
+          <div className="absolute left-4 top-4 rounded-full border border-border bg-background/85 px-3 py-1.5 backdrop-blur-sm sm:left-5 sm:top-5 sm:px-4 sm:py-2">
+            <span className="font-sans text-[0.6rem] uppercase tracking-[0.14em] text-muted-foreground sm:text-[0.66rem] sm:tracking-[0.22em]">
               Google Maps embed placeholder
             </span>
           </div>
 
-          {/* floating address card */}
-          <div className="absolute bottom-5 left-5 max-w-xs rounded-2xl border border-border bg-background/90 p-5 shadow-soft backdrop-blur-md">
+          {/* Floating address card. Spans the gutters on mobile instead of
+              max-w-xs + left-5, which came to 340px inside a 350px box and
+              collided with the centre pin's pulse ring. */}
+          <div className="absolute inset-x-4 bottom-4 rounded-2xl border border-border bg-background/90 p-4 shadow-soft backdrop-blur-md sm:inset-x-auto sm:bottom-5 sm:left-5 sm:max-w-xs sm:p-5">
             <p className="font-serif text-lg text-foreground">{clinic.name}</p>
             <p className="mt-1 font-sans text-sm text-muted-foreground">{clinic.address}</p>
             <button

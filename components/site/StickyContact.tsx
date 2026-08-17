@@ -49,7 +49,9 @@ export const StickyContact = () => {
     // this renders *after* {children} in the layout, so an equal z-index would
     // win the tie and float over an open menu. Under 50 means under the grain
     // overlay (z-index 41) too — the documented content/grain/chrome order.
-    <div className="fixed bottom-5 right-4 z-40 flex flex-col gap-2.5 md:bottom-8 md:right-6 md:gap-3">
+    // bottom clears the iOS home indicator (~34px) where the device reports one,
+    // and falls back to the original 20px everywhere else.
+    <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-4 z-40 flex flex-col gap-2.5 md:bottom-8 md:right-6 md:gap-3">
       <Button asChild size="icon" className={PILL}>
         {/* Bare <a>, not next/link: wa.me is external and tel: is a protocol
             URL — the same composition MobileMenu already uses for the phone. */}

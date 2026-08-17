@@ -25,7 +25,7 @@ interface PageShellSkeletonProps {
 }
 
 export const PageShellSkeleton = ({
-  heroClassName = "h-[62vh] min-h-[460px]",
+  heroClassName = "h-[62svh] min-h-[460px]",
   rows = 2,
 }: PageShellSkeletonProps) => (
   <div className="relative min-h-screen bg-background text-foreground">
@@ -45,7 +45,9 @@ export const PageShellSkeleton = ({
         <div className="container mx-auto space-y-16">
           {Array.from({ length: rows }, (_, row) => (
             <div key={row} className="grid items-center gap-10 md:grid-cols-12 md:gap-16">
-              <div className="relative aspect-[4/5] overflow-hidden rounded-2xl md:col-span-5">
+              {/* Mirrors the doctor portrait box in DoctorsPage — if that
+                  aspect changes and this does not, the fold jumps on route swap. */}
+              <div className="relative aspect-square overflow-hidden rounded-2xl md:col-span-5 md:aspect-[4/5]">
                 <Skeleton />
               </div>
               <div className="space-y-4 md:col-span-6 md:col-start-7">

@@ -22,12 +22,14 @@
 
 - Tailwind CSS utility classes only — no hardcoded hex values; extend the Tailwind theme with the project's color tokens
 - Follow spacing, border-radius, and shadow conventions defined in `ui-context.md`
-- **`app/gallery/` is exempt from both rules above and only those two.** It is a
-  deliberate design island (see `architecture.md`), so it uses literal values
-  and arbitrary Tailwind classes throughout and must not reference a token.
-  Watch for token classes that do not look like tokens: `rounded-sm|md|lg|xl`
-  resolve to `var(--radius)`, and a bare `border-*` width inherits
-  `--border` from the `*` rule in `globals.css` unless a colour is named
+- **No exemptions.** `app/gallery/` used to be one; the final-changes pass moved
+  it onto tokens like every other route (see `architecture.md`). The single
+  surviving hex in the codebase is the four-colour Google "G" in
+  `components/home/Testimonials.tsx`, where brand marks are exempt by definition
+- Watch for token classes that do not look like tokens: `rounded-sm|md|lg|xl`
+  resolve to `var(--radius)` (so `rounded-sm` is 8px here, not 2px), and a bare
+  `border-*` width inherits `--border` from the `*` rule in `globals.css` unless
+  a colour is named
 
 ## Animation
 

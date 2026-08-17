@@ -84,7 +84,9 @@ export const Footer = () => {
           {/* Treatments */}
           <div className="md:col-span-3">
             <h4 className="font-sans text-xs uppercase tracking-[0.24em] text-gold">Treatments</h4>
-            <ul className="mt-5 space-y-3">
+            {/* Ten items stacked one-per-row made the mobile footer ~1100px tall;
+                2-up until the column layout takes over at md. */}
+            <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 md:block md:space-y-3">
               {treatments.map((t) => (
                 <li key={t.slug}>
                   <Link
@@ -120,7 +122,9 @@ export const Footer = () => {
         </div>
 
         {/* bottom bar */}
-        <div className={cn("flex flex-col items-center justify-between gap-4 border-t border-bone/15 py-7 sm:flex-row")}>
+        {/* Extra bottom padding below sm: the StickyContact rail is fixed over
+            x ∈ [W−60, W−16], and the centred legal row overlapped it at ≤360px. */}
+        <div className={cn("flex flex-col items-center justify-between gap-4 border-t border-bone/15 pb-20 pt-7 sm:flex-row sm:pb-7")}>
           <p className="font-sans text-xs text-bone/50">
             © {new Date().getFullYear()} {clinic.name}. All rights reserved.
           </p>
