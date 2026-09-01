@@ -40,7 +40,10 @@ export default function TreatmentDetailPage({ slug }: { slug: string }) {
       <Navbar />
       <main>
         {/* Hero — unique background per treatment */}
-        <section id="top" className="relative flex h-[60svh] min-h-[440px] items-center overflow-hidden">
+        <section
+          id="top"
+          className="relative flex min-h-[max(60svh,440px)] items-center overflow-hidden pt-[104px] pb-12"
+        >
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={treatmentHeroImage(t.slug)}

@@ -23,7 +23,10 @@ export default function BookPage() {
         {/* Deliberately shorter than the 62vh heroes on the browse routes:
             /book is a task, and the first field should not start below the
             fold. */}
-        <section id="top" className="relative flex h-[42svh] min-h-[340px] items-center overflow-hidden">
+        <section
+          id="top"
+          className="relative flex min-h-[max(42svh,340px)] items-center overflow-hidden pt-[104px] pb-12"
+        >
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={backgrounds.hero1}

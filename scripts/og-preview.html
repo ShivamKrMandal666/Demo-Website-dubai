@@ -1,0 +1,186 @@
+<meta charset="utf-8" />
+<!--
+  Source for public/website-preview.jpg — the 1200x630 social card unfurled by
+  WhatsApp, iMessage, Slack and X (wired up in app/layout.tsx). Not part of the
+  Next build; it is shot once, by hand, and the result is committed.
+
+  Regenerate (Chrome path varies by machine):
+
+    chrome --headless=new --disable-gpu --hide-scrollbars \
+      --virtual-time-budget=8000 --window-size=1200,630 \
+      --screenshot=out.png scripts/og-preview.html
+
+    node -e "require('sharp')('out.png').jpeg({quality:90,chromaSubsampling:'4:4:4',mozjpeg:true}).toFile('public/website-preview.jpg')"
+
+  --virtual-time-budget is load-bearing: without it the shot can land before
+  Fraunces and Jost arrive and the card renders in fallback faces. Verify the
+  output is EXACTLY 1200x630 — crawlers honour the width/height in the metadata.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Jost:wght@300;400;500&display=block"
+  rel="stylesheet"
+/>
+<style>
+  /* Maison Lumé design tokens — app/globals.css */
+  :root {
+    --espresso-deep: hsl(24 26% 8%);
+    --gold: hsl(36 46% 60%);
+    --gold-soft: hsl(38 52% 74%);
+    --bone: hsl(40 33% 96%);
+    --font-serif: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+    --font-sans: "Jost", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+
+  .frame {
+    position: relative;
+    width: 1200px;
+    height: 630px;
+    background: var(--espresso-deep);
+    overflow: hidden;
+  }
+
+  .photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    /* Matches the ken-burns end state on the live hero, so the crop reads like
+       the site rather than like the raw source photo. */
+    transform: scale(1.06) translate3d(-1%, -0.6%, 0);
+  }
+
+  /* --gradient-hero + --gradient-hero-bottom, the exact overlays every page
+     hero stacks on its background image. Third layer is extra: an OG card is
+     read at thumbnail size, so the text side needs more contrast than a hero. */
+  .scrim-x {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      hsl(24 26% 8% / 0.92) 0%,
+      hsl(24 26% 8% / 0.72) 46%,
+      hsl(24 26% 8% / 0.24) 100%
+    );
+  }
+  .scrim-y {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, hsl(24 26% 8% / 0.35) 0%, hsl(24 26% 8% / 0) 40%, hsl(24 26% 8% / 0.7) 100%);
+  }
+
+  /* Hairline inset border — the editorial framing device used across the site. */
+  .rule-frame {
+    position: absolute;
+    inset: 40px;
+    border: 1px solid hsl(40 33% 96% / 0.16);
+    pointer-events: none;
+  }
+
+  /* 80px safe margin on every edge: Twitter/WhatsApp crop the card differently
+     and nothing important may sit outside this box. */
+  .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 88px;
+  }
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 56px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.85;
+  }
+
+  h1 {
+    margin-top: 30px;
+    max-width: 830px;
+    font-family: var(--font-serif);
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-size: 78px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--bone);
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--gold-soft);
+  }
+
+  .sub {
+    margin-top: 28px;
+    max-width: 700px;
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 26px;
+    line-height: 1.5;
+    color: hsl(40 33% 96% / 0.82);
+  }
+
+  .footer-row {
+    position: absolute;
+    left: 88px;
+    right: 88px;
+    bottom: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 15px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: hsl(40 33% 96% / 0.58);
+  }
+  .footer-row .by {
+    color: var(--bone);
+    font-weight: 500;
+  }
+</style>
+
+<div class="frame">
+  <img
+    class="photo"
+    src="../public/images/backgrounds/hero-1.jpg"
+  />
+  <div class="scrim-x"></div>
+  <div class="scrim-y"></div>
+  <div class="rule-frame"></div>
+
+  <div class="content">
+    <div class="eyebrow">Fully Customizable Demo</div>
+    <h1>Modern Aesthetic<br />Clinic <em>Website</em></h1>
+    <div class="sub">
+      Branding, treatments, doctors, photos and contact details — all yours to change.
+    </div>
+  </div>
+
+  <div class="footer-row">
+    <span>Treatments · Doctors · Gallery · Booking</span>
+    <span class="by">By Neptune B2B</span>
+  </div>
+</div>

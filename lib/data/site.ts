@@ -155,7 +155,11 @@ export const clinic: Clinic = {
 // Consultation button in both the footer column and the mobile menu.
 export const navLinks: NavLink[] = [
   { label: "Home", to: "/", scroll: "#top" },
-  { label: "Treatments", to: "/treatments", scroll: "#treatments" },
+  // Every entry scrolls to "#top". A section hash here would be pushed as a URL
+  // fragment on cross-page navigation (see lib/use-site-nav.ts) and then honoured
+  // by <RouteTransition />, so the main nav item would open the route part-way
+  // down — and the hash would persist through refresh and back/forward.
+  { label: "Treatments", to: "/treatments", scroll: "#top" },
   { label: "Doctors", to: "/doctors", scroll: "#top" },
   { label: "Contact", to: "/contact", scroll: "#top" },
   { label: "Gallery", to: "/gallery", scroll: "#top" },
