@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: `Doctors — ${clinic.name}`,
   description:
     "Meet the five doctors of Maison Lumé — facial harmonisation, injectable artistry, skin and laser medicine, regenerative therapies and non-surgical rejuvenation.",
+  // Restated, not inherited — the root canonical is "/". See app/treatments/page.tsx.
+  alternates: { canonical: "/doctors" },
 };
 
 export default function Page() {

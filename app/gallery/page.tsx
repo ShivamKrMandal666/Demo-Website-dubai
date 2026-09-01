@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   title: `Gallery — ${clinic.name}`,
   description:
     "An infinite, draggable wall of imagery from the clinic — treatments, specialists and interiors.",
+  // Restated, not inherited — the root canonical is "/". See app/treatments/page.tsx.
+  alternates: { canonical: "/gallery" },
 };
 
 // No next/dynamic here. The route is already its own client bundle, so the

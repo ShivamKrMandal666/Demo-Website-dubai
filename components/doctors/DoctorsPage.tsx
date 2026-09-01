@@ -47,7 +47,10 @@ export default function DoctorsPage() {
       <main>
         {/* Hero — reuses an existing optimized background, same ken-burns
             treatment as /treatments. */}
-        <section id="top" className="relative flex h-[62svh] min-h-[460px] items-center overflow-hidden">
+        <section
+          id="top"
+          className="relative flex min-h-[max(62svh,460px)] items-center overflow-hidden pt-[104px] pb-12"
+        >
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={backgrounds.hero2}

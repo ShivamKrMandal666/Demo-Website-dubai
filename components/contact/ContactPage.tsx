@@ -24,7 +24,10 @@ export default function ContactPage() {
         {/* Hero — reuses an existing optimized background. hero3 is the one
             slideshow image not yet serving as a page hero (hero2 is /doctors,
             treatments-hero is /treatments). */}
-        <section id="top" className="relative flex h-[62svh] min-h-[460px] items-center overflow-hidden">
+        <section
+          id="top"
+          className="relative flex min-h-[max(62svh,460px)] items-center overflow-hidden pt-[104px] pb-12"
+        >
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={backgrounds.hero3}

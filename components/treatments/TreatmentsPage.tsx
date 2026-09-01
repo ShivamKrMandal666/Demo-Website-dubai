@@ -21,8 +21,21 @@ export default function TreatmentsPage() {
     <div className="relative min-h-screen bg-background text-foreground">
       <Navbar />
       <main>
-        {/* Hero — single static background image */}
-        <section id="top" className="relative flex h-[62svh] min-h-[460px] items-center overflow-hidden">
+        {/* Hero — single static background image.
+            `min-h` + `pt-[104px]`, never `h-`: the Navbar is fixed at h-[72px]
+            (73px with its border) and nothing in the layout reserves its space,
+            so every hero has to. Two halves, both load-bearing:
+              - `min-h`, because a fixed height cannot grow — border-box padding
+                would only squeeze the centred content back up under the bar,
+                which is exactly what put "OUR TREATMENTS" on the branding.
+              - 104px, not 73px, because clearing the bar by 0px still reads as
+                collision. 32px of air is the smallest gap that does not.
+            Measured at 320/375/768/1440; the 3-line h1 at 320px is the worst
+            case. Keep PageShellSkeleton's heroClassName in step with this. */}
+        <section
+          id="top"
+          className="relative flex min-h-[max(62svh,460px)] items-center overflow-hidden pt-[104px] pb-12"
+        >
           {/* LCP element for this route — fetched eagerly. */}
           <MediaImage
             src={backgrounds.treatmentsHero}
@@ -53,7 +66,7 @@ export default function TreatmentsPage() {
             <FadeUp delay={240}>
               <div className="mt-8 flex flex-wrap gap-4">
                 <BookButton variant="gold" size="xl" className="rounded-full" />
-                <ScrollButton to="#treatments" variant="hero" size="xl" className="rounded-full">
+                <ScrollButton to="#full-menu" variant="hero" size="xl" className="rounded-full">
                   Explore the menu
                 </ScrollButton>
               </div>
@@ -61,8 +74,12 @@ export default function TreatmentsPage() {
           </div>
         </section>
 
-        {/* Our Treatments — non-uniform grid */}
-        <section id="treatments" className="relative overflow-hidden py-20 md:py-28">
+        {/* Our Treatments — non-uniform grid.
+            "full-menu", not "treatments": the home page's Signature Treatments
+            section already owns "#treatments", and sharing the id is how a nav
+            entry meant for the home section came to hijack this route. Only the
+            hero's "Explore the menu" button targets this anchor. */}
+        <section id="full-menu" className="relative overflow-hidden py-20 md:py-28">
           <div className="absolute inset-0 bg-muted opacity-60" aria-hidden="true">
             <Image src={textures.treatments} alt="" fill sizes="100vw" className="object-cover" />
           </div>

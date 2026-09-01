@@ -23,6 +23,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${t.name} — ${clinic.name}`,
     description: t.tagline,
+    // Restated, not inherited — the root canonical is "/". See app/treatments/page.tsx.
+    alternates: { canonical: `/treatments/${slug}` },
   };
 }
 

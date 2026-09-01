@@ -18,14 +18,17 @@ import { Skeleton } from "@/components/site/Skeleton";
 // ---------------------------------------------------------------------------
 
 interface PageShellSkeletonProps {
-  /** Match the real hero's height so the fold does not jump on swap. */
+  /**
+   * Match the real hero's height AND its `pt-[104px]` fixed-Navbar offset so
+   * the fold does not jump on swap — see the note in TreatmentsPage.
+   */
   heroClassName?: string;
   /** Content blocks below the hero. */
   rows?: number;
 }
 
 export const PageShellSkeleton = ({
-  heroClassName = "h-[62svh] min-h-[460px]",
+  heroClassName = "min-h-[max(62svh,460px)] pt-[104px] pb-12",
   rows = 2,
 }: PageShellSkeletonProps) => (
   <div className="relative min-h-screen bg-background text-foreground">
@@ -33,8 +36,10 @@ export const PageShellSkeleton = ({
     <main>
       {/* Hero band — dark, like every real hero, so the page does not flash
           light and then go dark a moment later. */}
-      <section className={cn("relative overflow-hidden bg-espresso", heroClassName)}>
-        <div className="container relative z-10 mx-auto flex h-full flex-col justify-center gap-4">
+      <section className={cn("relative flex items-center overflow-hidden bg-espresso", heroClassName)}>
+        {/* `w-full`, not `h-full`: the hero box is min-height now, so its
+            height is auto and a percentage height resolves to nothing. */}
+        <div className="container relative z-10 mx-auto flex w-full flex-col gap-4">
           <div className="h-3 w-40 rounded-full bg-bone/15" />
           <div className="h-10 w-full max-w-2xl rounded-lg bg-bone/10 sm:h-14" />
           <div className="h-4 w-full max-w-md rounded-full bg-bone/10" />

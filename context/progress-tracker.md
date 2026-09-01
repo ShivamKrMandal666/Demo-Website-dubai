@@ -5,8 +5,8 @@ open risk — small fixes belong in git history, not here.
 
 ## Status
 
-**Prototype.** Every nav page is built and live. Last verification (2026-08-17,
-after `final-changes.md`): `typecheck`/`lint`/`build` clean, **19** static pages,
+**Prototype.** Every nav page is built and live. Last verification (2026-09-01,
+after `current-issues.md`): `typecheck`/`lint`/`build` clean, **19** static pages,
 none dynamic, shared First Load JS 102 kB.
 
 Lighthouse mobile, median of 3, before -> after this pass. **CLS stayed 0 on
@@ -44,10 +44,12 @@ TBT and cost 2 points.
   user-reachable horizontal scroll (`scrollX` stays 0).
 - **Google reviews carousel** — `Testimonials` upgraded in place: server shell +
   `ReviewsCarousel` client leaf, 8 dummy reviews, 1-up mobile / 3-up desktop.
+- **Sharing metadata** — root `openGraph`/`twitter`/`metadataBase`; the unfurl is
+  the Neptune B2B demo pitch, the visible site stays Maison Lumé.
 
 ## Next Up
 
-Nothing scoped. `context/prompts/final-changes.md` is delivered.
+Nothing scoped. `context/prompts/current-issues.md` is delivered.
 
 ## Open Questions
 
@@ -131,6 +133,19 @@ Nothing scoped. `context/prompts/final-changes.md` is delivered.
   submit target, by design). **Both dropdowns are native `<select>`s**: shadcn's is
   ~18–20 kB of Radix over a better mobile picker. **`/book` prerenders because
   `useSearchParams` sits under a `<Suspense>` whose fallback is the real form.**
+- **Nothing reserves the fixed Navbar's 72px — every hero must.** `min-h-[max(…)]`
+  + `pt-[104px]`, never `h-`: a fixed-height box cannot grow, so padding only
+  squeezes the centred content back under the bar (that was the eyebrow/branding
+  overlap). `PageShellSkeleton` mirrors it or the fold jumps on route swap.
+- **Nav `scroll` is `#top` on every route.** Anything else is pushed as a URL
+  fragment cross-page, honoured by `RouteTransition`, and then persists through
+  refresh and back/forward — `#treatments` opened `/treatments` at the Full Menu.
+  That section is `#full-menu` now; `#treatments` belongs to the home page.
+- **Social preview is a committed static file**, `public/website-preview.jpg`,
+  shot from `scripts/og-preview.html` (see it for the command). JPEG q90/4:4:4 at
+  103 kB — the same PNG is 777 kB and WhatsApp drops cards it cannot fetch.
+  `alternates.canonical` is inherited, so **every route restates its own** or it
+  declares itself a duplicate of `/`.
 - **Misc:** App Router + TS at the repo root (the FastAPI backend was deleted);
   generated slug unions (`as const satisfies`) make a missing portrait fail
   `typecheck`, with deliberately **no `/doctors/[slug]` route**; `RouteTransition`
