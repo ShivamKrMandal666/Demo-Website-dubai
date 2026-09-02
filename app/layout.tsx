@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SmoothScroll } from "@/components/site/SmoothScroll";
 import { RouteTransition } from "@/components/site/RouteTransition";
 import { RouteProgress } from "@/components/site/RouteProgress";
+import { BootProgress } from "@/components/site/BootProgress";
 import { MotionProvider } from "@/components/site/MotionProvider";
 import { StickyContact } from "@/components/site/StickyContact";
 import "@/app/globals.css";
@@ -12,12 +13,43 @@ import "@/app/globals.css";
 // Exposed as CSS variables consumed by --font-serif / --font-sans in globals.css.
 // Loaded as a variable font (weight + optical size), matching the
 // ital,opsz,wght axes the old Google Fonts <link> requested.
+//
+// `preload: false` — NOT because the font is optional, but because of what it
+// costs at the front of the queue. The two Fraunces faces measured 149 kB over
+// the wire (italic 81.7 kB, roman 67.4 kB) and next/font emits a
+// <link rel="preload"> for each, so both landed in the top priority band ahead
+// of the render-blocking stylesheet and every JS chunk. On a weak connection
+// that is most of the reason the deployed link took 8+ seconds to become
+// useful. Without the preload they are discovered from the CSS instead of
+// racing it: same files, same final rendering, just no longer first in line.
+//
+// This is safe here specifically because next/font also generates a size-adjusted
+// `Fraunces Fallback` face (local("Times New Roman"), ascent-override 84.71%,
+// size-adjust 115.45%). Paired with `display: "swap"` the fallback occupies the
+// same box, so the swap does not move layout — CLS must stay 0, and that is the
+// check on this change.
+//
+// NOTE, measured: this flag is not per-font. Setting it on Fraunces drops the
+// preload for EVERY font in this layout, Jost included — the built HTML goes
+// from three `<link rel="preload" as="font">` to none, and Fraunces' files lose
+// the `-s.p.woff2` marker while Jost keeps it. So the saving is the full
+// 175.7 kB, not the 149 kB the two Fraunces faces account for.
+//
+// Losing Jost's preload as well is a fair trade rather than a regret. The
+// stylesheet is render-blocking, so the browser parses it — and discovers every
+// @font-face in it — before it can paint anything at all. A preload only brings
+// the swap forward by the stylesheet's own download time; it never unblocks the
+// first paint, because `display: "swap"` already paints in the metric-matched
+// `Jost Fallback` (local("Arial"), size-adjust 96.01%). On the weak connection
+// this whole pass is aimed at, 26.6 kB not competing at top priority is worth
+// more than a marginally earlier swap.
 const fraunces = Fraunces({
   subsets: ["latin"],
   axes: ["opsz"],
   style: ["normal", "italic"],
   variable: "--font-fraunces",
   display: "swap",
+  preload: false,
 });
 
 const jost = Jost({
@@ -95,9 +127,14 @@ export default function RootLayout({
       <body>
         <SmoothScroll />
         <RouteTransition />
-        {/* Sits at z-[60], above both the grain overlay (z-41) and the mobile
+        {/* Two halves of one bar. BootProgress is a CSS keyframe that runs from
+            the first painted frame, covering the wait before any script has
+            hydrated — the window in which the deployed link looked broken.
+            RouteProgress takes over at hydration and owns route changes.
+            Both sit at z-[60], above the grain overlay (z-41) and the mobile
             Sheet (z-50) — a navigation started from the open menu still shows
             its progress. */}
+        <BootProgress />
         <RouteProgress />
         <div className="grain-overlay" aria-hidden="true" />
         <MotionProvider>{children}</MotionProvider>

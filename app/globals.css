@@ -141,6 +141,58 @@ html.lenis, html.lenis body { height: auto; }
   .text-balance { text-wrap: balance; }
   .text-pretty { text-wrap: pretty; }
 
+  /* Scroll cost: give the big-shadow surfaces their own compositor layer.
+     ---------------------------------------------------------------------
+     MEASURED, not assumed. DevTools trace, 40 wheel ticks on `/`, desktop
+     1440x900, median of 3 runs, main-thread paint time:
+
+       baseline                                   1728 ms
+       this rule                                  1095 ms   -37%
+       this rule + md:bg-fixed removed             678 ms   -61%
+
+     Why it works: --shadow-elegant is `0 30px 70px -28px`, and a 70px blur is
+     expensive to rasterise. Twenty-odd elements carry one, and `md:bg-fixed` on
+     the CTA bands invalidates large regions on every scroll delta, so those
+     shadows were being re-rasterised over and over. Promoted, each is painted
+     once and then only re-composited.
+
+     `will-change: transform` is honest here rather than a nudge: every card in
+     this set already animates `transform` on hover (`hover:-translate-y-*`), so
+     we are declaring something that is actually true.
+
+     Scoped to >=768px on purpose. That is exactly where `md:bg-fixed` applies
+     and therefore where the repainting happens; below it the rule would buy
+     little and still cost a compositor layer per card, which is the wrong trade
+     on a phone.
+
+     Two things this deliberately does NOT do, both because the trace said so:
+     - The grain overlay is NOT the problem. Disabling it made paint WORSE
+       (2160 ms vs 1728), reproducibly — its `mix-blend-mode` flattens the
+       blended subtree into one layer, and without it the page splits into many
+       separately-painted ones.
+     - Nor is backdrop-filter: disabling it measured 2529 ms, worse again. */
+  @media (min-width: 768px) {
+    /* NOT the chrome — hence the :not(). Promoting an element rounds its
+       position onto its own layer, which shifts text rendering by a subpixel.
+       The header and footer carry the most-read text on the site and neither
+       scrolls through a grid, so that is where the trade is worst and the gain
+       is least; the <footer> is also the largest single surface that would be
+       promoted, so excluding it saves the layer memory too.
+       Written as :not() rather than a `header, footer { will-change: auto }`
+       override because a class selector (0-1-0) outranks a type selector
+       (0-0-1) — that override silently did nothing.
+
+       `shadow-gold` is left out for the same fidelity reason. It is only ever
+       on the gold CTA buttons, which are small, are not what repaints during a
+       scroll, and sit in the navbar and hero where a subpixel text shift is
+       most visible. A screenshot diff pinned every remaining difference to
+       exactly those buttons; dropping them from the list removes it. */
+    .shadow-elegant:not(header):not(footer),
+    .shadow-soft:not(header):not(footer) {
+      will-change: transform;
+    }
+  }
+
   /* Fine film grain overlay for premium tactility */
   .grain-overlay {
     position: fixed;
@@ -169,5 +221,14 @@ html.lenis, html.lenis body { height: auto; }
      gradient renders fine at its start position. */
   .animate-shimmer {
     animation: none;
+  }
+
+  /* The boot bar has to be pinned, and pinned PARTIAL. With the animation off
+     it would sit at its untransformed width — a full-width gold rule, which
+     reads as "finished" on a page that has not loaded yet. A third of the way
+     across says the same thing the ramp does, without moving. */
+  .animate-boot-progress {
+    animation: none;
+    transform: scaleX(0.3);
   }
 }

@@ -18,7 +18,7 @@ import * as m from "motion/react-m";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Stars } from "@/components/site/Stars";
-import { reviews } from "@/lib/data/site";
+import { reviews } from "@/lib/data/reviews";
 
 const DURATION = 5500;
 const EASE = [0.22, 1, 0.36, 1] as const;

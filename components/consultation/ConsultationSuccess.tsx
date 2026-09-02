@@ -8,7 +8,8 @@ import {
   timePreferences,
   type ConsultationValues,
 } from "@/lib/data/consultation";
-import { getDoctorBySlug, getTreatmentBySlug } from "@/lib/data/site";
+import { getDoctorBySlug } from "@/lib/data/doctors";
+import { getTreatmentBySlug } from "@/lib/data/site";
 
 // The optimistic confirmation. It replaces the form the instant validation
 // passes — no spinner, no simulated latency, because there is no backend to

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import { bookHref } from "@/lib/consultation";
-import type { DoctorSlug, TreatmentSlug } from "@/lib/data/site";
+import type { DoctorSlug } from "@/lib/data/doctors";
+import type { TreatmentSlug } from "@/lib/data/site";
 
 // Every booking CTA on the site. Replaces ToastButton + BOOKING_TOAST, which
 // fired a toast claiming a request had been received without one being made.

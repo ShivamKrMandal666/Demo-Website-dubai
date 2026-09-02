@@ -28,22 +28,26 @@ export const About = () => (
                 src={textures.about}
                 alt=""
                 fill
-                sizes="(min-width: 768px) 42vw, 100vw"
+                sizes="(min-width: 768px) 42vw, 100vw"
                 className="object-cover"
               />
             </div>
             <div className="absolute -left-4 -top-4 hidden h-full w-full rounded-2xl bg-primary/10 md:block" aria-hidden="true" />
             {/* The source is 928x1152 (0.805) against this 4:5 box (0.800), so
-                `object-cover` trims well under a percent off one edge. `eager`
-                rather than `priority`: this is the first image below the fold
-                on `/`, but the hero's <h1> is the route's LCP and a second
-                preload only competes with the stylesheet. */}
+                `object-cover` trims well under a percent off one edge.
+                Neither `priority` nor `eager`: this sits below the fold on `/`,
+                and next/image preloads an eager image exactly as it preloads a
+                priority one. This is the repo's only PNG and its AVIF measured
+                104 kB at w=1200 — the heaviest image on the site — so that
+                preload was competing with the stylesheet and the hero for the
+                first bytes on the connection. MediaImage's own 400px-margin
+                observer still promotes it to `eager` well before it scrolls
+                into view, so it arrives just as early without the queue jump. */}
             <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border bg-muted shadow-soft">
               <MediaImage
                 src={photos.clinicExterior}
                 alt="The Maison Lumé Esthétique clinic entrance, lit at dusk"
                 sizes="(min-width: 768px) 42vw, 100vw"
-                eager
               />
             </div>
             {/* floating accent stat */}

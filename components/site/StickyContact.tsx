@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { telHref, whatsappHref } from "@/lib/consultation";
-import { clinic } from "@/lib/data/site";
+import { clinic } from "@/lib/data/clinic";
 
 // Quick-contact rail: chat or call from anywhere, on every page. Deliberately
 // NOT a booking affordance — /book stays the only way into the consultation
