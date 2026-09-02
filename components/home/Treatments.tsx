@@ -34,16 +34,19 @@ const bento: { className?: string; sizes: string }[] = [
   },
 ];
 
+// No `eager` here. next/image preloads an eager image just as it preloads a
+// priority one, and every card in this bento is below the fold on `/` — the
+// preload only competed with the stylesheet and the hero for the first bytes.
+// MediaImage's 400px-margin observer promotes each card to `eager` on approach,
+// so they still load ahead of being seen.
 const TreatmentCard = ({
   t,
   className,
   sizes,
-  eager,
 }: {
   t: TreatmentRecord;
   className?: string;
   sizes: string;
-  eager?: boolean;
 }) => (
   <RevealItem className={cn("h-full", className)}>
     <Link
@@ -58,7 +61,6 @@ const TreatmentCard = ({
         <MediaImage
           src={treatmentCardImage(t.slug)}
           alt={t.name}
-          eager={eager}
           sizes={sizes}
           className="transition-transform duration-700 ease-out group-hover:scale-105"
         />
@@ -120,9 +122,6 @@ export const Treatments = () => (
             t={t}
             className={bento[i]?.className}
             sizes={bento[i]?.sizes ?? "(min-width: 768px) 33vw, 100vw"}
-            // The 2x2 feature card is the largest image in this section and the
-            // first one a visitor scrolls into from the hero.
-            eager={i === 0}
           />
         ))}
       </RevealStagger>

@@ -15,8 +15,8 @@ const MobileMenu = dynamic(
   () => import("@/components/site/MobileMenu").then((m) => m.MobileMenu),
   { ssr: false },
 );
-import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/site";
-import { useSiteNav } from "@/lib/use-site-nav";
+import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/clinic";
+import { useSiteNav, useNavPrefetch } from "@/lib/use-site-nav";
 
 // The wordmark behaves like the Home nav link: scroll to top when already
 // home, navigate home from anywhere else.
@@ -53,6 +53,10 @@ export const Navbar = () => {
   // dynamic import is not part of the hydration critical path.
   const [panelReady, setPanelReady] = useState(false);
   const handleNavigate = useSiteNav();
+  // Warms every nav destination's RSC payload on idle — the prefetch that
+  // next/link would have done for us if these were anchors. Hosted here because
+  // Navbar renders on every route except /gallery.
+  useNavPrefetch();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);

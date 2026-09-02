@@ -106,8 +106,8 @@ export default function TreatmentsPage() {
               stagger={0.08}
               className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mt-16 md:grid-cols-6"
             >
-              {treatments.map((t, i) => (
-                <TreatmentGridCard key={t.slug} t={t} index={i} />
+              {treatments.map((t) => (
+                <TreatmentGridCard key={t.slug} t={t} />
               ))}
             </RevealStagger>
           </div>

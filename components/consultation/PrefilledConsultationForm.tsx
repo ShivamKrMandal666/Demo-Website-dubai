@@ -2,7 +2,8 @@
 
 import { useSearchParams } from "next/navigation";
 import { ConsultationForm } from "@/components/consultation/ConsultationForm";
-import { getDoctorBySlug, getTreatmentBySlug } from "@/lib/data/site";
+import { getDoctorBySlug } from "@/lib/data/doctors";
+import { getTreatmentBySlug } from "@/lib/data/site";
 
 // The query-string half of /book, kept in its own client leaf so the page
 // itself stays a server component and `useSearchParams` sits under a single

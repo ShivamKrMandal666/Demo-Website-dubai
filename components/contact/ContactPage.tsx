@@ -1,4 +1,4 @@
-import { ConsultationForm } from "@/components/consultation/ConsultationForm";
+import dynamic from "next/dynamic";
 import { ContactDetails } from "@/components/contact/ContactDetails";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
@@ -9,6 +9,16 @@ import { FadeUp } from "@/components/site/FadeUp";
 import { ScrollButton } from "@/components/site/ScrollButton";
 import { MediaImage } from "@/components/site/MediaImage";
 import { backgrounds } from "@/lib/images";
+
+// The form is the single biggest client payload on this route — ~300 lines with
+// seven fields and their validation — and it sits well below the fold, under the
+// hero and three paragraphs. Default `ssr: true`, so it is still prerendered
+// into the HTML and remains usable as soon as it hydrates; only its chunk moves
+// out of the first load. `/book` imports it through its own Suspense boundary
+// and is untouched.
+const ConsultationForm = dynamic(() =>
+  import("@/components/consultation/ConsultationForm").then((m) => m.ConsultationForm),
+);
 
 // Rendered by app/contact/page.tsx. A server component — the form is the only
 // interactive part and it is a client leaf, so the page shell, the hero and the

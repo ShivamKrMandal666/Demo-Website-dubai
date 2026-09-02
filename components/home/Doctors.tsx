@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Reveal } from "@/components/site/Reveal";
 import { MediaImage } from "@/components/site/MediaImage";
-import { doctors } from "@/lib/data/site";
+import { doctors } from "@/lib/data/doctors";
 import { doctorPortrait } from "@/lib/images";
 
 const DURATION = 5500;

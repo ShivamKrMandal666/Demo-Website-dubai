@@ -3,50 +3,31 @@
 // every page reads from here (see context/architecture.md invariants).
 // ---------------------------------------------------------------------------
 
-export interface Clinic {
-  name: string;
-  tagline: string;
-  established: number;
-  phone: string;
-  /** Separate from `phone` on purpose — the landline cannot receive WhatsApp. */
-  whatsapp: string;
-  email: string;
-  address: string;
-  hours: string;
-}
-
-/**
- * Routes that actually exist in the App Router today. Widen this union when a
- * new route ships — never hand a NavLink a string.
- */
-export type SupportedRoute =
-  | "/"
-  | "/treatments"
-  | "/doctors"
-  | "/contact"
-  | "/gallery"
-  | "/book";
-
-/**
- * A nav link is either a "coming soon" placeholder, or a real destination that
- * MUST carry both the route it lives on and an in-page `scroll` target. The
- * union makes the inert-link bug unrepresentable: after the `soon` check,
- * `to` and `scroll` are both guaranteed.
- */
-export type NavLink =
-  | {
-      label: string;
-      /** Renders a "coming soon" toast instead of navigating. */
-      soon: true;
-    }
-  | {
-      label: string;
-      soon?: false;
-      /** Route the section lives on. Required — drives cross-page navigation. */
-      to: SupportedRoute;
-      /** In-page selector to smooth-scroll to once on `to`. Required. */
-      scroll: string;
-    };
+// This file owns the TREATMENTS. Everything else it exports is re-exported from
+// a leaf module beside it — ./clinic, ./doctors, ./reviews — so that every
+// existing `@/lib/data/site` import keeps working unchanged.
+//
+// THE RULE: server components may import anything from here. CLIENT components
+// must import from the leaf directly (`@/lib/data/clinic`, `@/lib/data/doctors`,
+// `@/lib/data/reviews`), never through this file.
+//
+// Why: `treatmentSlugs` at the bottom is `treatments.map(...)`, a module-scope
+// call webpack cannot prove is side-effect free. So evaluating this module means
+// evaluating `treatments`, and naming ANY export in an import from here compiles
+// all ten treatment records — ~288 lines of prose — into that route's bundle.
+// Reaching the leaves through this re-export therefore un-does the split.
+//
+// That was not hypothetical. StickyContact sits in the root layout and imports
+// `clinic`; Navbar and MobileMenu import `navLinks`. Between them they put the
+// full treatment and doctor data into the layout chunk of every route on the
+// site — measured at 23.6 kB raw / 9.5 kB brotli, to render a phone number and
+// five nav labels.
+export type { Clinic, SupportedRoute, NavLink } from "./clinic";
+export { clinic, navLinks } from "./clinic";
+export type { Doctor, DoctorRecord, DoctorSlug } from "./doctors";
+export { doctors, getDoctorBySlug } from "./doctors";
+export type { Review, GoogleRating } from "./reviews";
+export { reviews, googleRating } from "./reviews";
 
 export interface TimelinePhase {
   phase: string;
@@ -80,90 +61,6 @@ export interface Treatment {
   span: TreatmentSpan;
 }
 
-/**
- * Shape of one doctor. Same arrangement as `Treatment` above: the arrays are
- * `readonly` and `slug` stays `string`, which is what lets the `doctors`
- * literal be declared `as const satisfies` and generate `DoctorSlug` from the
- * data instead of hand-listing it.
- */
-export interface Doctor {
-  slug: string;
-  initials: string;
-  name: string;
-  credentials: string;
-  /** Position at the clinic, shown under the name on /doctors. */
-  role: string;
-  specialty: string;
-  /** Years in practice. */
-  years: number;
-  languages: readonly string[];
-  /** Short pills — used by the Home carousel and the /doctors profile. */
-  tags: readonly string[];
-  /** Areas of clinical focus, listed on /doctors. */
-  focus: readonly string[];
-  /** Education and fellowship lines, listed on /doctors. */
-  training: readonly string[];
-  /** Short bio — the Home carousel shows this one. */
-  bio: string;
-  /** Longer philosophy paragraph. /doctors only. */
-  approach: string;
-}
-
-export interface Review {
-  /** Stable React key. Display names collide too easily to key a carousel on. */
-  id: string;
-  quote: string;
-  name: string;
-  /** What they came in for — the card's second attribution line. */
-  treatment: string;
-  /** Whole stars, 1–5. Rendered per review, so these are not all 5. */
-  rating: number;
-  /** Relative recency, the way Google prints it. */
-  when: string;
-}
-
-export interface GoogleRating {
-  score: number;
-  reviews: number;
-}
-
-export const clinic: Clinic = {
-  name: "Maison Lumé",
-  tagline: "Aesthetic & Cosmetic Clinic",
-  established: 2009,
-  phone: "+44 20 7946 0123",
-  // PLACEHOLDER — Ofcom drama-reserved mobile range, unmistakably fake. Swap
-  // for the real number before any of this is shown to a visitor.
-  whatsapp: "+44 7700 900123",
-  email: "hello@maisonlume.com",
-  address: "24 Marchmont Row, Mayfair, London W1",
-  hours: "Mon – Sat · 9:00 – 19:00",
-};
-
-// Every link is live now that /gallery has shipped. Order is deliberate:
-// Gallery sits last because it is a design-isolated full-screen experience
-// (see app/gallery/) rather than another page of the site proper — leaving the
-// site is the point of it, so it reads as the end of the list.
-//
-// This one array is the only place nav order is expressed: Navbar, MobileMenu
-// and the Footer "Explore" column all map over it, so reordering here reorders
-// all three. The `soon` arm of NavLink has no instances at the moment; it stays
-// because it is how the next unbuilt page gets listed without a dead link.
-//
-// `/book` is deliberately absent: it is a CTA destination, not a section of the
-// site, and listing it would put "Book" directly above the gold Book a
-// Consultation button in both the footer column and the mobile menu.
-export const navLinks: NavLink[] = [
-  { label: "Home", to: "/", scroll: "#top" },
-  // Every entry scrolls to "#top". A section hash here would be pushed as a URL
-  // fragment on cross-page navigation (see lib/use-site-nav.ts) and then honoured
-  // by <RouteTransition />, so the main nav item would open the route part-way
-  // down — and the hash would persist through refresh and back/forward.
-  { label: "Treatments", to: "/treatments", scroll: "#top" },
-  { label: "Doctors", to: "/doctors", scroll: "#top" },
-  { label: "Contact", to: "/contact", scroll: "#top" },
-  { label: "Gallery", to: "/gallery", scroll: "#top" },
-];
 
 // The 10 treatments. `home: true` items appear in the Home "Signature
 // Treatments" section (reusing the same generated card images). `span` drives
@@ -472,233 +369,3 @@ export const treatmentSlugs: readonly TreatmentSlug[] = treatments.map((t) => t.
 
 export const getTreatmentBySlug = (slug: string): TreatmentRecord | undefined =>
   treatments.find((t) => t.slug === slug);
-
-// The five specialists. `as const satisfies` for the same reason as
-// `treatments` above: it keeps each `slug` a literal, so `DoctorSlug` — and the
-// portrait map in lib/images.ts that is keyed by it — is generated from this
-// array rather than maintained alongside it.
-export const doctors = [
-  {
-    slug: "elena-whitfield",
-    initials: "EW",
-    name: "Dr. Elena Whitfield",
-    credentials: "MD, FRCS · Founder & Medical Director",
-    role: "Founder & Medical Director",
-    specialty: "Facial Harmonisation",
-    years: 18,
-    languages: ["English", "French"],
-    tags: ["Facial Balancing", "Rhinomodelling", "Regenerative"],
-    focus: [
-      "Whole-face assessment and proportion",
-      "Non-surgical rhinomodelling",
-      "Advanced injectable correction",
-      "Complication management and revision",
-    ],
-    training: [
-      "MD, King's College London",
-      "FRCS (Plast) — Royal College of Surgeons",
-      "Fellowship in Facial Aesthetic Medicine, Paris",
-    ],
-    bio: "With over fifteen years in aesthetic medicine, Elena is known for an exacting, natural-first philosophy — treating the face as a whole, never a checklist.",
-    approach:
-      "Elena founded Maison Lumé on a simple conviction: the best aesthetic work is the work nobody can name. Every consultation begins with what a patient wants to feel rather than what they want to change, and she will decline a treatment as readily as she recommends one. She leads the clinic's peer review, where every complex plan is discussed by the full team before a needle is drawn.",
-  },
-  {
-    slug: "marcus-adeyemi",
-    initials: "MA",
-    name: "Dr. Marcus Adeyemi",
-    credentials: "MBBS, MRCP · Aesthetic Physician",
-    role: "Aesthetic Physician",
-    specialty: "Injectable Artistry",
-    years: 11,
-    languages: ["English", "Yoruba"],
-    tags: ["Anti-wrinkle", "Lip Enhancement", "Profhilo"],
-    focus: [
-      "Expression-preserving anti-wrinkle treatment",
-      "Lip definition and hydration",
-      "Profhilo and bio-remodelling",
-      "Preventative programmes for under-35s",
-    ],
-    training: [
-      "MBBS, University of Manchester",
-      "MRCP — Royal College of Physicians",
-      "Advanced Injectables Diploma, London",
-    ],
-    bio: "Marcus blends a physician's precision with an artist's eye, specialising in subtle injectable work that reads as simply well-rested.",
-    approach:
-      "Marcus treats movement as part of the result, not something to be removed. He works in small, staged amounts and reviews at two weeks rather than committing everything in one sitting — an approach that takes longer and consistently produces the outcome patients actually asked for. He is the doctor most often requested by people having their first treatment.",
-  },
-  {
-    slug: "sofia-marchetti",
-    initials: "SM",
-    name: "Dr. Sofia Marchetti",
-    credentials: "MD · Dermatology & Laser",
-    role: "Consultant Dermatologist",
-    specialty: "Skin & Laser Medicine",
-    years: 14,
-    languages: ["English", "Italian", "Spanish"],
-    tags: ["Pigmentation", "Resurfacing", "Rosacea"],
-    focus: [
-      "Melasma and stubborn pigmentation",
-      "Fractional laser resurfacing",
-      "Rosacea and reactive skin",
-      "Medical-grade skincare protocols",
-    ],
-    training: [
-      "MD, Università di Bologna",
-      "Specialist Registration in Dermatology",
-      "Laser & Energy-Based Devices Fellowship, Milan",
-    ],
-    bio: "A dermatologist by training, Sofia leads our laser and skin-health programmes, restoring clarity and tone through evidence-led protocols.",
-    approach:
-      "Sofia came to aesthetics from clinical dermatology, and it shows in how she sequences a course: skin is prepared for weeks before a laser is switched on, and every protocol is adjusted to how that particular skin actually responded, not to a standard schedule. She is the clinic's reference point for darker skin types and for anything that has been treated badly elsewhere.",
-  },
-  {
-    slug: "jonathan-pryce",
-    initials: "JP",
-    name: "Dr. Jonathan Pryce",
-    credentials: "MD · Regenerative Aesthetics",
-    role: "Lead, Regenerative Medicine",
-    specialty: "Regenerative Therapies",
-    years: 16,
-    languages: ["English"],
-    tags: ["PRP", "Polynucleotides", "Biostimulators"],
-    focus: [
-      "Platelet-rich plasma for skin and scalp",
-      "Polynucleotide skin quality programmes",
-      "Collagen biostimulators",
-      "Hair restoration protocols",
-    ],
-    training: [
-      "MD, University of Edinburgh",
-      "Diploma in Regenerative Aesthetic Medicine",
-      "Clinical research in autologous therapies",
-    ],
-    bio: "Jonathan pioneers our regenerative approach, using the body's own signalling to improve skin quality gradually and durably.",
-    approach:
-      "Jonathan is the least interested of the five in an immediate result. His programmes are built around what skin looks like in six months, using the body's own repair signalling rather than added volume — which makes him the doctor patients see when they want to age well rather than look different. He keeps his own outcome data and will show it to you.",
-  },
-  {
-    slug: "rami-haddad",
-    initials: "RH",
-    name: "Dr. Rami Haddad",
-    credentials: "MBChB · Cosmetic Doctor",
-    role: "Cosmetic Doctor",
-    specialty: "Non-Surgical Rejuvenation",
-    years: 12,
-    languages: ["English", "Arabic", "German"],
-    tags: ["Threads", "Skin Tightening", "Contouring"],
-    focus: [
-      "PDO and PLLA thread lifting",
-      "Jawline and profile contouring",
-      "Energy-based skin tightening",
-      "Male aesthetic treatment",
-    ],
-    training: [
-      "MBChB, American University of Beirut",
-      "Advanced Thread Lift Certification, Seoul",
-      "Facial Contouring Masterclass, Dubai",
-    ],
-    bio: "Rami focuses on non-surgical lifting and contouring, crafting refined, unhurried plans that respect each patient's natural architecture.",
-    approach:
-      "Rami's work is structural — he reads a face for where support has been lost before he considers where to add. Threads and contouring are unforgiving of a heavy hand, so he plans in stages across months and tells patients plainly when surgery would serve them better than anything he can offer. He runs the clinic's male aesthetics consultations.",
-  },
-] as const satisfies readonly Doctor[];
-
-/**
- * A doctor as it actually exists in the data — `slug` is the literal union
- * rather than `string`. Use this for anything that feeds `doctorPortrait`.
- */
-export type DoctorRecord = (typeof doctors)[number];
-
-/** The five slugs, as a union. Generated — never hand-edit. */
-export type DoctorSlug = DoctorRecord["slug"];
-
-// Mirrors `getTreatmentBySlug` above. There is deliberately no /doctors/[slug]
-// route, but /book?doctor=<slug> has to turn an untrusted query string into a
-// real record — reading `.slug` off the result is what narrows it back to the
-// literal union, so nothing needs to cast the raw param.
-export const getDoctorBySlug = (slug: string): DoctorRecord | undefined =>
-  doctors.find((d) => d.slug === slug);
-
-// Eight, not three. The carousel shows three at a time on desktop and rotates by
-// one, so anything under four would repeat a card inside a single view.
-//
-// PLACEHOLDER — invented reviews for the prototype. Replace with the real Google
-// Business feed before launch; nothing here is a real customer.
-export const reviews: Review[] = [
-  {
-    id: "isabelle-r",
-    quote:
-      "I finally look like myself — just rested. The team's restraint is everything; nothing overdone, everything considered.",
-    name: "Isabelle R.",
-    treatment: "Profhilo & Skin",
-    rating: 5,
-    when: "2 weeks ago",
-  },
-  {
-    id: "daniel-m",
-    quote:
-      "From the consultation to aftercare it felt genuinely bespoke. The most natural results I've ever had, without question.",
-    name: "Daniel M.",
-    treatment: "Facial Harmonisation",
-    rating: 5,
-    when: "a month ago",
-  },
-  {
-    id: "priya-n",
-    quote:
-      "A calm, beautiful space and doctors who actually listen. I trust them completely with my skin.",
-    name: "Priya N.",
-    treatment: "Laser Resurfacing",
-    rating: 5,
-    when: "a month ago",
-  },
-  {
-    id: "helena-k",
-    quote:
-      "They talked me out of two things I'd asked for and suggested something subtler. I've never had a clinic do that before.",
-    name: "Helena K.",
-    treatment: "Injectables & Fillers",
-    rating: 5,
-    when: "2 months ago",
-  },
-  {
-    id: "marcus-a",
-    quote:
-      "Booked for one session, stayed for the follow-up care. Everything was explained, nothing was rushed, and the result speaks quietly.",
-    name: "Marcus A.",
-    treatment: "Thread Lifts",
-    rating: 5,
-    when: "2 months ago",
-  },
-  {
-    id: "sofia-l",
-    quote:
-      "Six weeks in and my skin still looks like it did the day I left. Worth every bit of the wait for an appointment.",
-    name: "Sofia L.",
-    treatment: "Chemical Peels",
-    rating: 5,
-    when: "3 months ago",
-  },
-  {
-    id: "george-w",
-    quote:
-      "Genuinely excellent clinicians and a beautiful space. Only note is that parking nearby is a challenge — plan for the walk.",
-    name: "George W.",
-    treatment: "Regenerative Aesthetics",
-    rating: 4,
-    when: "3 months ago",
-  },
-  {
-    id: "amara-o",
-    quote:
-      "The consultation alone was worth it. I left understanding my own skin better than I have in years.",
-    name: "Amara O.",
-    treatment: "Signature Facials",
-    rating: 5,
-    when: "4 months ago",
-  },
-];
-
-export const googleRating: GoogleRating = { score: 4.9, reviews: 1247 };

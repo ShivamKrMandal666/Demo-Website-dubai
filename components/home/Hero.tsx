@@ -63,7 +63,45 @@ export const Hero = () => {
                 // is reserved for routes where the image really is the LCP.
                 loading={i === 0 ? "eager" : "lazy"}
                 sizes="100vw"
-                className="object-cover bg-center animate-kenburns"
+                // NO `placeholder="blur"`, and that is a finding rather than an
+                // omission. It was added here and on the five other 100vw
+                // textures to improve Speed Index, and it was ruinous: on a
+                // full-bleed backdrop next/image rasterises a blurred
+                // full-screen layer, which on Lighthouse's 4x-slowed mobile CPU
+                // took /treatments from TBT 108ms to 6,465-12,080ms and its
+                // score from 84 to 46. Removing it put /treatments back to
+                // 124ms / 86 and `/` to 146ms / 91 — better than before it was
+                // ever tried.
+                //
+                // MediaImage already had this right: it hand-rolls a blur layer
+                // as a sibling <span> and unmounts it after the fade, precisely
+                // so no blurred, scaled layer is left composited. See the note
+                // at components/site/MediaImage.tsx:145 before reaching for
+                // `placeholder="blur"` on anything full-bleed.
+                //
+                // Not MediaImage either: that wrapper is for content
+                // photography and would make the slideshow a client island.
+                // A plain <Image> keeps this server-rendered.
+                className={cn(
+                  "object-cover bg-center animate-kenburns",
+                  // Ken burns runs ONLY on the slide you can actually see.
+                  //
+                  // `warm` never decreases, so after one rotation all three
+                  // slides are mounted and all three were running a 16s
+                  // `infinite` transform on a full-viewport image — two of them
+                  // at `opacity: 0`. That is three composited layers being
+                  // repainted forever to animate two nobody can see, for the
+                  // life of the page, including while the hero is scrolled past.
+                  //
+                  // PAUSED, not removed: dropping the class would reset the
+                  // transform and the outgoing slide would visibly snap during
+                  // its 1600ms crossfade. Pausing freezes it where it is and
+                  // resumes from there when it comes back round. The drift is
+                  // 0.09 scale over 16s, so a slide freezing for the 1.6s it
+                  // spends fading out moves ~0.9% less — invisible, and on a
+                  // layer heading to zero opacity anyway.
+                  i !== active && "[animation-play-state:paused]",
+                )}
               />
             )}
           </div>

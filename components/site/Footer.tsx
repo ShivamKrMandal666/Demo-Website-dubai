@@ -1,25 +1,24 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { Instagram, Facebook, Youtube, Linkedin, Phone, Mail, MapPin, Clock } from "lucide-react";
-import { toast } from "sonner";
+import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BookButton } from "@/components/site/BookButton";
-import { navLinks, treatments, clinic } from "@/lib/data/site";
-import { useSiteNav } from "@/lib/use-site-nav";
+import {
+  FooterSocials,
+  FooterNavLinks,
+  FooterLegal,
+} from "@/components/site/FooterInteractive";
+import { treatments, clinic } from "@/lib/data/site";
 import { textures } from "@/lib/images";
 
-const socials = [
-  { Icon: Instagram, label: "Instagram" },
-  { Icon: Facebook, label: "Facebook" },
-  { Icon: Youtube, label: "YouTube" },
-  { Icon: Linkedin, label: "LinkedIn" },
-];
-
+// A SERVER component, deliberately. It was `"use client"` for three clusters of
+// buttons, which meant its `treatments` import — the largest array in
+// lib/data/site — was reachable from the client graph on every route, since the
+// Footer is shared chrome. Those clusters now live in FooterInteractive.tsx as
+// client leaves, and the ten treatment links below are plain server-rendered
+// <Link>s. The four lucide icons in the contact block are server-rendered too.
+// See the header comment in FooterInteractive.tsx.
 export const Footer = () => {
-  const handleNav = useSiteNav();
-
   return (
     // Sits as its own block below the map section — no overlap. The gold
     // hairline plus the top border define the seam against the page above.
@@ -50,35 +49,13 @@ export const Footer = () => {
               A private aesthetic &amp; cosmetic clinic devoted to natural,
               considered results — in the heart of Mayfair.
             </p>
-            <div className="mt-6 flex gap-3">
-              {socials.map(({ Icon, label }) => (
-                <button
-                  key={label}
-                  aria-label={label}
-                  onClick={() => toast(`${label} link coming soon`)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-bone/20 text-bone/70 transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-accent-foreground"
-                >
-                  <Icon className="h-4 w-4" />
-                </button>
-              ))}
-            </div>
+            <FooterSocials />
           </div>
 
           {/* Quick links */}
           <div className="md:col-span-2">
             <h4 className="font-sans text-xs uppercase tracking-[0.24em] text-gold">Explore</h4>
-            <ul className="mt-5 space-y-3">
-              {navLinks.map((link) => (
-                <li key={link.label}>
-                  <button
-                    onClick={() => handleNav(link)}
-                    className="font-sans text-sm text-bone/70 transition-colors duration-300 hover:text-bone"
-                  >
-                    {link.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            <FooterNavLinks />
           </div>
 
           {/* Treatments */}
@@ -128,17 +105,7 @@ export const Footer = () => {
           <p className="font-sans text-xs text-bone/50">
             © {new Date().getFullYear()} {clinic.name}. All rights reserved.
           </p>
-          <div className="flex gap-6">
-            {["Privacy Policy", "Terms", "Cookies"].map((l) => (
-              <button
-                key={l}
-                onClick={() => toast(`${l} — coming soon`)}
-                className="font-sans text-xs text-bone/50 transition-colors hover:text-bone/80"
-              >
-                {l}
-              </button>
-            ))}
-          </div>
+          <FooterLegal />
         </div>
       </div>
     </footer>

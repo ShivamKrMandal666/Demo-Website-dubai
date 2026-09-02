@@ -190,15 +190,17 @@ export default function DoctorsPage() {
                             See the note in components/home/Doctors.tsx.
                             PageShellSkeleton mirrors this box; change both. */}
                         <div className="relative aspect-square overflow-hidden rounded-3xl border border-border bg-muted shadow-elegant md:aspect-[4/5]">
-                          {/* Not `priority` — the hero above is this route's
-                              declared LCP element. The first profile is
-                              `eager`: it sits immediately under the hero, so
-                              waiting for it to intersect is what produced the
-                              first-scroll pop. */}
+                          {/* Neither `priority` nor `eager` — the hero above is
+                              this route's declared LCP element, and next/image
+                              preloads an eager image exactly as it preloads a
+                              priority one, so marking the first profile eager
+                              put a second portrait preload in front of the
+                              stylesheet. MediaImage's 400px-margin observer
+                              still fetches it a screenful early, which is what
+                              actually fixes the first-scroll pop. */}
                           <MediaImage
                             src={doctorPortrait(doc.slug)}
                             alt={doc.name}
-                            eager={i === 0}
                             sizes="(min-width: 768px) 40vw, 100vw"
                             className="object-top md:object-center"
                           />

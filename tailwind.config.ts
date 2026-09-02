@@ -79,6 +79,14 @@ const config: Config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        // The pre-hydration half of the top progress bar. Same shape as the
+        // JS ramp in RouteProgress — quick off the mark, decelerating toward a
+        // ceiling short of 100% — but expressed as a keyframe so it can run
+        // from the very first frame, before any script has parsed.
+        "boot-progress": {
+          "0%": { transform: "scaleX(0.02)" },
+          "100%": { transform: "scaleX(0.9)" },
+        },
         "pulse-ring": {
           "0%": { transform: "scale(0.85)", opacity: "0.7" },
           "100%": { transform: "scale(2.4)", opacity: "0" },
@@ -102,6 +110,10 @@ const config: Config = {
         // activity rather than as waiting. The keyframe was already here,
         // unused, from the original design pass.
         shimmer: "shimmer 2.4s linear infinite",
+        // 8s to approach the ceiling, heavily decelerating: long enough that a
+        // genuinely slow load never sees it stall, `forwards` so it holds at
+        // 90% rather than snapping back if hydration takes longer still.
+        "boot-progress": "boot-progress 8s cubic-bezier(0.1,0.85,0.2,1) forwards",
         "pulse-ring": "pulse-ring 2.6s cubic-bezier(0.22,1,0.36,1) infinite",
         "scroll-cue": "scroll-cue 1.8s ease-in-out infinite",
       },

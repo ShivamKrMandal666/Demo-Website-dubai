@@ -1,12 +1,22 @@
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 import { ToastButton } from "@/components/site/ToastButton";
 import { SectionLabel } from "@/components/site/SectionLabel";
 import { Stars } from "@/components/site/Stars";
 import { Reveal } from "@/components/site/Reveal";
-import { ReviewsCarousel } from "@/components/home/ReviewsCarousel";
 import { googleRating } from "@/lib/data/site";
 import { textures } from "@/lib/images";
+
+// Split for the same reason as the doctors carousel on `/`: this is a client
+// island near the bottom of the page, carrying AnimatePresence and the eight
+// `reviews` records. Default `ssr: true`, so the cards are still in the
+// prerendered HTML and the fold does not move — only the hydrating chunk is
+// deferred. The server shell around it (backdrop, heading, Google rating block)
+// was already server-rendered and stays that way.
+const ReviewsCarousel = dynamic(() =>
+  import("@/components/home/ReviewsCarousel").then((m) => m.ReviewsCarousel),
+);
 
 const GoogleG = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 48 48" className={className} aria-hidden="true">

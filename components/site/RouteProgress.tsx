@@ -86,19 +86,18 @@ export function RouteProgress() {
   }, [finish]);
 
   // -- initial site load ----------------------------------------------------
-  // This component only mounts at hydration, by which point the document has
-  // usually loaded. Complete immediately in that case rather than inventing a
-  // ramp for something already finished.
+  // This component only mounts at hydration, and <BootProgress /> has been
+  // showing a CSS-driven bar since the first painted frame. So the job here is
+  // to LAND that bar, never to start a second one: mounting means hydration is
+  // done and the page is usable, which is the thing the bar was reporting.
+  //
+  // It used to ramp from 0 whenever readyState was not yet "complete", which is
+  // the common case — hydration normally beats window.load, since load waits on
+  // every image. Against a boot bar already sitting near 90% that read as the
+  // progress jumping backwards.
   useEffect(() => {
-    if (document.readyState === "complete") {
-      setVisible(true);
-      finish();
-      return;
-    }
-    start();
-    const done = () => finish();
-    window.addEventListener("load", done);
-    return () => window.removeEventListener("load", done);
+    setVisible(true);
+    finish();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

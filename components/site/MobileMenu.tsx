@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { BOOK_CTA_LABEL } from "@/components/site/BookButton";
 import { telHref } from "@/lib/consultation";
-import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/site";
+import { navLinks, clinic, type NavLink as NavLinkType } from "@/lib/data/clinic";
 import { cn } from "@/lib/utils";
 
 // The sliding panel only — `@radix-ui/react-dialog` is the sole Radix consumer

@@ -29,11 +29,15 @@ const sizesClass: Record<TreatmentSpan, string> = {
   4: "(min-width: 768px) 66vw, (min-width: 640px) 50vw, 100vw",
 };
 
-// `eager` on the first row: those cards sit just under the 62vh hero, so
-// waiting for them to intersect is what produced the pop on first scroll.
-const EAGER_ROWS = 2;
+// No `eager` on the first row any more. It was there because waiting for those
+// cards to intersect produced a pop on first scroll — but next/image turns an
+// eager image into a <link rel="preload">, so two card images were racing the
+// stylesheet and this route's own `priority` hero for the first bytes on the
+// connection. MediaImage's 400px-margin observer already solves the pop without
+// the queue jump: the cards start fetching a screenful before they are reached,
+// they just no longer do it at the expense of first paint.
 
-export const TreatmentGridCard = ({ t, index }: { t: TreatmentRecord; index: number }) => (
+export const TreatmentGridCard = ({ t }: { t: TreatmentRecord }) => (
   <RevealItem className={cn("h-full", spanClass[t.span] || "md:col-span-2")}>
     <Link
       href={`/treatments/${t.slug}`}
@@ -43,7 +47,6 @@ export const TreatmentGridCard = ({ t, index }: { t: TreatmentRecord; index: num
         <MediaImage
           src={treatmentCardImage(t.slug)}
           alt={t.name}
-          eager={index < EAGER_ROWS}
           sizes={sizesClass[t.span] || "100vw"}
           className="transition-transform duration-700 ease-out group-hover:scale-105"
         />
